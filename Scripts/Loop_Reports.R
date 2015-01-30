@@ -12,6 +12,6 @@ for (i in 1:length(conditions$trials)) {
   j <- conditions$trials[i]
   k <- conditions$food_conc[i]
   knit2html("./Scripts/Food_Optimization_Longevity_Report.Rmd", 
-            output = paste("./Results/p0", j, "_", k,"mgmL_Report.html", sep=""),
+            output = paste("./Results/p0", j, "_", k, "mgmL_Report.html", sep=""),
             stylesheet = "./Scripts/foghorn_edited.css")
 }

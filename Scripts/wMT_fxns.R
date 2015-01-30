@@ -10,26 +10,25 @@ time_vector <- function(time, bin_size, num_bins) {
   for (i in 1:num_bins) {
     times <- c(times, (i * bin_size))
   }
-  times
   return(times)
 }
 
 find_num_groups <- function(file) {
   #for (i in 1:length(read.delim(file = file, head = F, skip = 5)[[1]]))
   i <- 1
-  while (str_split(read.delim(file, head = F, skip = 6, blank.lines.skip = F)[i,], " ")[[1]][1] != "") {
+  while (str_split(read.delim(file, head = FALSE, skip = 6, blank.lines.skip = FALSE)[i,], " ")[[1]][1] != "") {
     i <- i + 1
   }
   return (i - 1)
 }
 
 processMicrotrackerReport <- function(file) {
-  print(file)
-  bin_size <- as.numeric(str_split(read.delim(file=file, head=F, skip=5)[1, ], " ")[[1]][2])
-  time <- as.numeric(str_split(read.delim(file=file, head=F, skip=5)[1, ], " ")[[1]][length(str_split(read.delim(file=file, head=F, skip=5)[1, ], " ")[[1]])])
+  bin_size <- as.numeric(str_split(read.delim(file = file, head = FALSE, skip = 5)[1, ], " ")[[1]][2])
+  time <- as.numeric(str_split(read.delim(file = file, head = FALSE, skip = 5)[1, ], " ")[[1]][length(str_split(read.delim(file = file, head = FALSE, skip = 5)[1, ], " ")[[1]])])
   num_groups <- find_num_groups(file)
   num_bins <- time / bin_size
-  num <- as.numeric(str_split_fixed(read.delim(file=file, head=F, skip=6)[1:num_groups, ], " ", (num_bins + 1))[ ,2:(num_bins + 1)])
+  num <- as.numeric(str_split_fixed(read.delim(file = file, head = FALSE, skip = 6)[1:num_groups, ], " ", 
+                                    (num_bins + 1))[ , 2:(num_bins + 1)])
   full <- data.frame(row = rep(rep(c("A", "B", "C", "D", "E", "F", "G", "H"), 12), num_bins),
                      col = rep(rep(1:12, each = 8), num_bins),
                      time = rep(time_vector(time, bin_size, num_bins), each = num_groups),
