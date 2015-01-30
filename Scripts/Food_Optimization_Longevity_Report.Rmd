@@ -32,7 +32,7 @@ data.df$day <- rep(1:(length(files)), each = nstrains * replicates * num_bins)
 
 ## Raw Activity
 
-```{r Raw data, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, sep = "")}
+```{r Raw data, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(data.df) + aes(x = day, y = activity) + geom_point() + facet_grid(row ~ col) +
   labs(x = "Time (day)", y = "Activity", title = "Raw Activity Over Time")
@@ -80,7 +80,7 @@ data.df <- data.df %>%
 
 ## Binned Data
 
-```{r Binned Data, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, sep = "")}
+```{r Binned Data, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(data.df) + aes(x = factor(day), y = norm.act) + ylim(0, 100) + geom_boxplot() + facet_grid(row ~ strain) +
   labs(x= "Time (day)", y = "Activity")
@@ -89,9 +89,9 @@ ggplot(data.df) + aes(x = factor(day), y = norm.act) + ylim(0, 100) + geom_boxpl
 
 ## Combined Data
 
-```{r Combined Data, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, sep = "")}
+```{r Combined Data, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(combined.df) + aes(x = day, y = norm.act) + ylim(0, 100) + geom_point() + facet_grid(row ~ strain) +
+ggplot(combined.df) + aes(x = day, y = norm.act) + ylim(0, 100) + geom_line() + facet_grid(row ~ strain) +
   labs(x = "Time (day)", y = "Activity")
 
 ```
