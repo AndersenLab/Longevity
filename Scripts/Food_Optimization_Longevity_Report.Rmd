@@ -25,16 +25,18 @@ source(paste("./", experiment, ".R", sep = ""))
 ```{r, warning = F, message = F, echo = F}
 
 files <- dir(path = data.loc, plateID, full.names = T)
-data.df <- ldply(files, processMicrotrackerReport) %>% filter(time < 9)
-data.df$day <- rep(1:(length(files)), each = nstrains * replicates * num_bins)
+raw.df <- ldply(files, processMicrotrackerReport) %>% filter(time < num_bins * 2 + 1)
+raw.df$day <- rep(1:(length(files)), each = nstrains * replicates * num_bins)
+
+save(raw.df, file = paste(data.loc, "/", experiment, "_Raw.Rda", sep = ""), ascii = TRUE)
 
 ```
 
 ## Raw Activity
 
-```{r Raw data, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, sep = ""), fig.width = 15, fig.height = 12}
+```{r Raw, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(data.df) + aes(x = day, y = activity) + geom_point() + facet_grid(row ~ col) +
+ggplot(raw.df) + aes(x = day, y = activity) + geom_point() + facet_grid(row ~ col) +
   labs(x = "Time (day)", y = "Activity", title = "Raw Activity Over Time")
 
 ```
@@ -42,60 +44,96 @@ ggplot(data.df) + aes(x = day, y = activity) + geom_point() + facet_grid(row ~ c
 
 ```{r, warning = F, message = F, echo = F}
 
-combined.df <- aggregate(activity ~ row + col + day, data = data.df, sum)
+data.df <- raw.df[order(raw.df$col, raw.df$row, raw.df$day), ]
 
-```
-
-
-```{r, warning = F, message = F, echo = F}
-
-combined.df <- combined.df[order(combined.df$col, combined.df$row, combined.df$day), ]
-data.df <- data.df[order(data.df$col, data.df$row, data.df$day), ]
-
-combined.df$strain <- factor(combined.df$col, labels = strains)
 data.df$strain <- factor(data.df$col, labels = strains)
 
-```
-
-
-```{r, warning = F, message = F, echo = F}
-
-combined.df$activity[(combined.df$col %in% colRemove)] <- NA
-data.df$activity[(data.df$col %in% colRemove)] <- NA
+save(data.df, file = paste(data.loc, "/", experiment, "_Processed.Rda", sep = ""), ascii = TRUE)
 
 ```
 
 
 ```{r, warning = F, message = F, echo = F}
 
-combined.df <- combined.df %>%
-  group_by(col, row) %>%
-  mutate(norm.act = 100 * activity / max(activity, na.rm = T))
+cleaned.df <- data.df
+cleaned.df$activity[(data.df$col %in% colRemove)] <- NA
 
-data.df <- data.df %>%
-  group_by(col, row) %>%
-  mutate(norm.act = 100 * activity / max(activity, na.rm = T))
+save(cleaned.df, file = paste(data.loc, "/", experiment, "_Cleaned.Rda", sep = ""), ascii = TRUE)
 
 ```
 
-## Binned Data
 
-```{r Binned Data, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, sep = ""), fig.width = 15, fig.height = 12}
+```{r, warning = F, message = F, echo = F}
 
-ggplot(data.df) + aes(x = factor(day), y = norm.act) + ylim(0, 100) + geom_boxplot() + facet_grid(row ~ strain) +
+normalized.df <- cleaned.df %>%
+  group_by(col, row) %>%
+  mutate(norm.act = 100 * activity / max(activity, na.rm = T))
+
+cleaned.df <- ungroup(cleaned.df)
+
+save(normalized.df, file = paste(data.loc, "/", experiment, "_Normalized.Rda", sep = ""), ascii = TRUE)
+
+```
+
+## Normalized Data
+
+```{r Normalized, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(normalized.df) + aes(x = factor(day), y = norm.act) + ylim(0, 100) + geom_boxplot() + facet_grid(row ~ strain) +
   labs(x= "Time (day)", y = "Activity")
+
+```
+
+
+```{r, warning = F, message = F, echo = F}
+
+combined.df <- normalized.df
+combined.df <- combined.df %>%
+  group_by(strain, row, day) %>%
+  summarize(activity = sum(activity))
+combined.df <- ungroup(combined.df)
+combined.df <- combined.df %>%
+  group_by(strain, row) %>%
+  mutate(norm.act = 100 * activity / max(activity, na.rm = TRUE))
+
+save(combined.df, file = paste(data.loc, "/", experiment, "_Combined.Rda", sep = ""), ascii = TRUE)
 
 ```
 
 ## Combined Data
 
-```{r Combined Data, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, sep = ""), fig.width = 15, fig.height = 12}
+```{r Combined, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(combined.df) + aes(x = day, y = norm.act) + ylim(0, 100) + geom_line() + facet_grid(row ~ strain) +
   labs(x = "Time (day)", y = "Activity")
 
 ```
 
+```{r, warning = F, message = F, echo = F}
+
+summary.df <- normalized.df
+summary.df <- summary.df %>%
+  group_by(strain, day) %>%
+  summarize(activity = sum(activity))
+summary.df <- ungroup(summary.df)
+summary.df <- summary.df %>%
+  group_by(strain) %>%
+  mutate(norm.act = 100 * activity / max(activity, na.rm = TRUE))
+
+save(summary.df, file = paste(data.loc, "/", experiment, "_Summary.Rda", sep = ""), ascii = TRUE)
+
+```
+
+## Summary Data
+
+```{r Summary, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(summary.df) + aes(x = day, y = norm.act, color = strain) + ylim(0, 100) + geom_line() +
+  labs(x = "Time (day)", y = "Activity")
+
+```
+
+## Curve Fitting
 
 ```{r, warning = F, message = F, echo = F}
 
@@ -107,8 +145,12 @@ weibull <- function(input, df, row, col) {
   sum(((100 * 100 ^ (-((df$day[df$row == row & df$col == col] / input[2]) ^ input[1]))) - df$norm.act[df$row == row & df$col == col]) ^ 2)
 }
 
-twoplog <- function(input, df, row, col) {
-  sum(((100 / (1 + ((df$day[df$row == row & df$col == col] / input[2]) ^ input[1]))) - df$norm.act[df$row == row & df$col == col]) ^ 2)
+well_twoplog <- function(input, df, row, strain) {
+  sum(((100 / (1 + ((df$day[df$row == row & df$strain == strain] / input[2]) ^ input[1]))) - df$norm.act[df$row == row & df$strain == strain]) ^ 2)
+}
+
+strain_twoplog <- function(input, df, strain) {
+  sum(((100 / (1 + ((df$day[df$strain == strain] / input[2]) ^ input[1]))) - df$norm.act[df$strain == strain]) ^ 2)
 }
 
 threeplog <- function(input, df, row, col) {
@@ -117,18 +159,41 @@ threeplog <- function(input, df, row, col) {
 
 twoplog2 <- formula(norm.act ~ 100/(1 + ((day / b) ^ c)))
 
-#for (x in combined.df$row) {
- # for (y in combined.df$col) {
-  #  
-  #}
-#}
+well_params.df <- data.frame(strain = rep(levels(factor(combined.df$strain)), each = length(levels(factor(combined.df$row)))), row = rep(levels(factor(combined.df$row)), length(levels(factor(combined.df$strain)))), bparam = rep(0, length(strains) * replicates), cparam = rep(0, length(strains) * replicates))
 
-```
+l = 1
 
-```{r, warning = F, message = F, echo = F}
+for (x in levels(factor(combined.df$strain))) {
+  for (y in levels(factor(combined.df$row))) {
+    if (!(is.na(combined.df$norm.act[combined.df$row == y & combined.df$strain == x]))[1] == TRUE) {
+      temp <- nlm(well_twoplog, c(2, 2), combined.df, y, x)[["estimate"]]
+      well_params.df$bparam[l] <- temp[1]
+      well_params.df$cparam[l] <- temp[2]
+      }
+    l = l + 1
+    }
+  }
 
-save(combined.df, file = paste(data.loc, "Combined_", experiment, ".Rda", sep = ""), ascii = TRUE)
-save(data.df, file = paste(data.loc, "Separate_", experiment, ".Rda", sep = ""), ascii = TRUE)
+save(well_params.df, file = paste(data.loc, "/", experiment, "_Well_Params.Rda", sep = ""), ascii = TRUE)
+
+print(well_params.df)
+
+strain_params.df <- data.frame(strain = levels(factor(combined.df$strain)), bparam = rep(0, length(strains)), cparam = rep(0, length(strains)))
+
+l = 1
+
+for (x in levels(factor(combined.df$strain))) {
+  if(!(is.na(summary.df$norm.act[summary.df$strain == x]))[1] == TRUE) {
+    temp <- nlm(strain_twoplog, c(2, 2), summary.df, x)[["estimate"]]
+    strain_params.df$bparam[l] <- temp[1]
+    strain_params.df$cparam[l] <- temp[2]
+  }
+  l = l + 1
+}
+
+save(strain_params.df, file = paste(data.loc, "/", experiment, "_Strain_Params.Rda", sep = ""), ascii = TRUE)
+
+print(strain_params.df)
 
 ```
 
