@@ -19,8 +19,10 @@ data.loc <- paste("../Data/Raw/", experiment, "/", sep = "")
 source("./wMT_fxns.R")
 source(paste("./", experiment, ".R", sep = ""))
 
-```
+paste(experiment)
 
+```
+ 
 
 ```{r, warning = F, message = F, echo = F}
 
@@ -65,21 +67,21 @@ save(cleaned.df, file = paste(data.loc, "/", experiment, "_Cleaned.Rda", sep = "
 
 ```{r, warning = F, message = F, echo = F}
 
-normalized.df <- cleaned.df %>%
+well_normalized.df <- cleaned.df %>%
   group_by(col, row) %>%
-  mutate(norm.act = 100 * activity / max(activity, na.rm = T))
+  mutate(norm.act = 100 * activity / max(activity, na.rm = TRUE))
 
 cleaned.df <- ungroup(cleaned.df)
 
-save(normalized.df, file = paste(data.loc, "/", experiment, "_Normalized.Rda", sep = ""), ascii = TRUE)
+save(well_normalized.df, file = paste(data.loc, "/", experiment, "_Well_Normalized.Rda", sep = ""), ascii = TRUE)
 
 ```
 
-## Normalized Data
+## Well Normalized Data
 
-```{r Normalized, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Well_Normalized, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(normalized.df) + aes(x = factor(day), y = norm.act) + ylim(0, 100) + geom_boxplot() + facet_grid(row ~ strain) +
+ggplot(well_normalized.df) + aes(x = factor(day), y = norm.act) + ylim(0, 100) + geom_boxplot() + facet_grid(row ~ strain) +
   labs(x= "Time (day)", y = "Activity")
 
 ```
@@ -87,7 +89,7 @@ ggplot(normalized.df) + aes(x = factor(day), y = norm.act) + ylim(0, 100) + geom
 
 ```{r, warning = F, message = F, echo = F}
 
-combined.df <- normalized.df
+combined.df <- well_normalized.df
 combined.df <- combined.df %>%
   group_by(strain, row, day) %>%
   summarize(activity = sum(activity))
@@ -109,9 +111,32 @@ ggplot(combined.df) + aes(x = day, y = norm.act) + ylim(0, 100) + geom_line() + 
 
 ```
 
+
 ```{r, warning = F, message = F, echo = F}
 
-summary.df <- normalized.df
+strain_normalized.df <- cleaned.df %>%
+  group_by(strain) %>%
+  mutate(norm.act = 100 * activity / max(activity, na.rm = TRUE))
+
+cleaned.df <- ungroup(cleaned.df)
+
+save(strain_normalized.df, file = paste(data.loc, "/", experiment, "_Strain_Normalized.Rda", sep = ""), ascii = TRUE)
+
+```
+
+## Strain Normalized Data
+
+```{r Strain_Normalized, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(strain_normalized.df) + aes(x = factor(day), y = norm.act) + ylim(0, 100) + geom_boxplot() + facet_wrap( ~ strain) + 
+  labs(x = "Time (day)", y = "Activity")
+
+```
+
+
+```{r, warning = F, message = F, echo = F}
+
+summary.df <- well_normalized.df
 summary.df <- summary.df %>%
   group_by(strain, day) %>%
   summarize(activity = sum(activity))
@@ -128,8 +153,39 @@ save(summary.df, file = paste(data.loc, "/", experiment, "_Summary.Rda", sep = "
 
 ```{r Summary, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(summary.df) + aes(x = day, y = norm.act, color = strain) + ylim(0, 100) + geom_line() +
+ggplot(summary.df) + aes(x = day, y = norm.act) + ylim(0, 100) + geom_line() + facet_wrap( ~ strain) +
   labs(x = "Time (day)", y = "Activity")
+
+```
+
+## Plate Distribution
+
+```{r Plate_Dist, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(normalized.df) + aes(x = factor(day), y = norm.act) + ylim(0, 100) + geom_boxplot() + labs(x = "Time (day)", y = "Activity")
+
+```
+
+
+```{r, warning = F, message = F, echo = F}
+
+plate.df <- cleaned.df 
+plate.df <- plate.df %>%
+  group_by(day) %>% 
+  summarize(total = sum(activity, na.rm = TRUE))
+plate.df <- ungroup(plate.df)
+plate.df <- plate.df %>%
+  mutate(norm.act = 100 * total / max(total, na.rm = TRUE))
+
+save(plate.df, file = paste(data.loc, "/", experiment, "_Plate.Rda", sep = ""), ascii = TRUE)
+
+```
+
+## Plate Data
+
+```{r Plate, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(plate.df) + aes(x = day, y= norm.act) + geom_line() + ylim(0, 100) + labs(x = "Time (day)", y = "Activity")
 
 ```
 
@@ -208,4 +264,3 @@ save(strain_params.df, file = paste(data.loc, "/", experiment, "_Strain_Params.R
 print(strain_params.df)
 
 ```
-
