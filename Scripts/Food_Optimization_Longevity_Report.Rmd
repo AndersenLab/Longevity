@@ -137,12 +137,20 @@ ggplot(summary.df) + aes(x = day, y = norm.act, color = strain) + ylim(0, 100) +
 
 ```{r, warning = F, message = F, echo = F}
 
-gompertz <- function(input, df, row, col) {
-  sum(((100 * 100 ^ ((input[1] / input[2]) * (1 - exp(input[2] * df$day[df$row == row & df$col == col])))) - df$norm.act[df$row == row & df$col == col]) ^ 2)
+well_gompertz <- function(input, df, row, strain) {
+  sum(((100 * 100 ^ ((input[1] / input[2]) * (1 - exp(input[2] * df$day[df$row == row & df$strain == strain])))) - df$norm.act[df$row == row & df$strain == strain]) ^ 2)
 }
 
-weibull <- function(input, df, row, col) {
-  sum(((100 * 100 ^ (-((df$day[df$row == row & df$col == col] / input[2]) ^ input[1]))) - df$norm.act[df$row == row & df$col == col]) ^ 2)
+strain_gompertz <- function(input, df, strain) {
+  sum(((100 * 100 ^ ((input[1] / input[2]) * (1 - exp(input[2] * df$day[df$strain == strain])))) - df$norm.act[df$strain == strain]) ^ 2)
+}
+
+well_weibull <- function(input, df, row, strain) {
+  sum(((100 * 100 ^ (-((df$day[df$row == row & df$strain == strain] / input[2]) ^ input[1]))) - df$norm.act[df$row == row & df$strain == strain]) ^ 2)
+}
+
+strain_weibull <- function(input, df, strain) {
+  sum(((100 * 100 ^ (-((df$day[df$strain == strain] / input[2]) ^ input[1]))) - df$norm.act[df$strain == strain]) ^ 2)
 }
 
 well_twoplog <- function(input, df, row, strain) {
@@ -153,8 +161,12 @@ strain_twoplog <- function(input, df, strain) {
   sum(((100 / (1 + ((df$day[df$strain == strain] / input[2]) ^ input[1]))) - df$norm.act[df$strain == strain]) ^ 2)
 }
 
-threeplog <- function(input, df, row, col) {
-  sum(((100 * 100 ^ (-input[2] * df$day[df$row == row & df$col == col] - (input[2] / input[3]) * ln((input[1] - (input[2] - input[1]) * exp(-input[3] * df$day[df$row == row & df$col == col])) / input[2]))) - df$norm.act[df$row == row & df$col == col]) ^ 2)
+well_threeplog <- function(input, df, row, strain) {
+  sum(((100 * 100 ^ (-input[2] * df$day[df$row == row & df$strain == strain] - (input[2] / input[3]) * ln((input[1] - (input[2] - input[1]) * exp(-input[3] * df$day[df$row == row & df$strain == strain])) / input[2]))) - df$norm.act[df$row == row & df$strain == strain]) ^ 2)
+}
+
+strain_threeplog <- function(input, df, strain) {
+  sum(((100 * 100 ^ (-input[2] * df$day[df$strain == strain] - (input[2] / input[3]) * ln((input[1] - (input[2] - input[1]) * exp(-input[3] * df$day[df$strain == strain])) / input[2]))) - df$norm.act[df$strain == strain]) ^ 2)
 }
 
 twoplog2 <- formula(norm.act ~ 100/(1 + ((day / b) ^ c)))
