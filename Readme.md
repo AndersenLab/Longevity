@@ -1,3 +1,12 @@
-Food Optimization for Longevity scoring using the wMicrotracker
-===
+wMicrotracker Scoring
+=====================
 
+## Food Optimization
+- [ ] 
+
+
+
+## Curve Fits
+- [X] `nlm` for regression
+- [ ] `nls` for regression
+	- `SelfStart` 
