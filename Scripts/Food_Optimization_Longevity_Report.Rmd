@@ -61,6 +61,9 @@ save(data.df, file = paste(data.loc, "/", experiment, "_Processed.Rda", sep = ""
 
 cleaned.df <- data.df
 cleaned.df$activity[(data.df$col %in% colRemove)] <- NA
+for(i in 1:length(wellRemove$row)) {
+  cleaned.df$activity[cleaned.df$row == wellRemove$row[i] & cleaned.df$col == wellRemove$col[i]] <- NA
+  }
 
 save(cleaned.df, file = paste(data.loc, "/", experiment, "_Cleaned.Rda", sep = ""), ascii = TRUE)
 
@@ -94,7 +97,7 @@ ggplot(well_normalized.df) + aes(x = factor(day), y = norm.act) + ylim(0, 100) +
 combined.df <- well_normalized.df
 combined.df <- combined.df %>%
   group_by(strain, row, day) %>%
-  summarize(activity = sum(activity))
+  summarize(activity = sum(activity, na.rm = TRUE))
 combined.df <- ungroup(combined.df)
 combined.df <- combined.df %>%
   group_by(strain, row) %>%
@@ -141,7 +144,7 @@ ggplot(strain_normalized.df) + aes(x = factor(day), y = norm.act) + ylim(0, 100)
 summary.df <- well_normalized.df
 summary.df <- summary.df %>%
   group_by(strain, day) %>%
-  summarize(activity = sum(activity))
+  summarize(activity = sum(activity, na.rm = TRUE))
 summary.df <- ungroup(summary.df)
 summary.df <- summary.df %>%
   group_by(strain) %>%

@@ -4,7 +4,8 @@ wMicrotracker Scoring
 ## Food Optimization
 
 - [X] Specify entire columns to exclude 
-- [ ] Specify individual wells to exclude
+- [X] Specify individual wells to exclude
+	- [ ] Go back through notes and remove specific wells
 - [ ] Comment code
 - [ ] Move functions to separate file
 - [ ] Move all library loads to the same file
