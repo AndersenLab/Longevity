@@ -8,15 +8,17 @@ output:
 ---
 
 
-```{r, warning = F, message = F, echo = F}
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
 library("plyr")
 library("dplyr")
 library("ggplot2")
+library("tidyr")
 
 experiment <- paste("p0", j, "_", k, "mgmL", sep = "")
 data.loc <- paste("../Data/Raw/", experiment, "/", sep = "")
 source("./wMT_fxns.R")
+source("./survival_fxns.R")
 source(paste("./", experiment, ".R", sep = ""))
 
 paste(experiment)
@@ -24,9 +26,9 @@ paste(experiment)
 ```
  
 
-```{r, warning = F, message = F, echo = F}
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
-files <- dir(path = data.loc, plateID, full.names = T)
+files <- dir(path = data.loc, plateID, full.names = TRUE)
 raw.df <- ldply(files, processMicrotrackerReport) %>% filter(time < num_bins * 2 + 1)
 raw.df$day <- rep(1:(length(files)), each = nstrains * replicates * num_bins)
 
@@ -36,7 +38,7 @@ save(raw.df, file = paste(data.loc, "/", experiment, "_Raw.Rda", sep = ""), asci
 
 ## Raw Activity
 
-```{r Raw, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Raw, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(raw.df) + aes(x = day, y = activity) + geom_point() + facet_grid(row ~ col) +
   labs(x = "Time (day)", y = "Activity", title = "Raw Activity Over Time")
@@ -44,7 +46,7 @@ ggplot(raw.df) + aes(x = day, y = activity) + geom_point() + facet_grid(row ~ co
 ```
 
 
-```{r, warning = F, message = F, echo = F}
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
 data.df <- raw.df[order(raw.df$col, raw.df$row, raw.df$day), ]
 
@@ -55,7 +57,7 @@ save(data.df, file = paste(data.loc, "/", experiment, "_Processed.Rda", sep = ""
 ```
 
 
-```{r, warning = F, message = F, echo = F}
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
 cleaned.df <- data.df
 cleaned.df$activity[(data.df$col %in% colRemove)] <- NA
@@ -65,7 +67,7 @@ save(cleaned.df, file = paste(data.loc, "/", experiment, "_Cleaned.Rda", sep = "
 ```
 
 
-```{r, warning = F, message = F, echo = F}
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
 well_normalized.df <- cleaned.df %>%
   group_by(col, row) %>%
@@ -79,7 +81,7 @@ save(well_normalized.df, file = paste(data.loc, "/", experiment, "_Well_Normaliz
 
 ## Well Normalized Data
 
-```{r Well_Normalized, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Well_Normalized, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(well_normalized.df) + aes(x = factor(day), y = norm.act) + ylim(0, 100) + geom_boxplot() + facet_grid(row ~ strain) +
   labs(x= "Time (day)", y = "Activity")
@@ -87,7 +89,7 @@ ggplot(well_normalized.df) + aes(x = factor(day), y = norm.act) + ylim(0, 100) +
 ```
 
 
-```{r, warning = F, message = F, echo = F}
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
 combined.df <- well_normalized.df
 combined.df <- combined.df %>%
@@ -104,7 +106,7 @@ save(combined.df, file = paste(data.loc, "/", experiment, "_Combined.Rda", sep =
 
 ## Combined Data
 
-```{r Combined, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Combined, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(combined.df) + aes(x = day, y = norm.act) + ylim(0, 100) + geom_line() + facet_grid(row ~ strain) +
   labs(x = "Time (day)", y = "Activity")
@@ -112,7 +114,7 @@ ggplot(combined.df) + aes(x = day, y = norm.act) + ylim(0, 100) + geom_line() + 
 ```
 
 
-```{r, warning = F, message = F, echo = F}
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
 strain_normalized.df <- cleaned.df %>%
   group_by(strain) %>%
@@ -126,7 +128,7 @@ save(strain_normalized.df, file = paste(data.loc, "/", experiment, "_Strain_Norm
 
 ## Strain Normalized Data
 
-```{r Strain_Normalized, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Strain_Normalized, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(strain_normalized.df) + aes(x = factor(day), y = norm.act) + ylim(0, 100) + geom_boxplot() + facet_wrap( ~ strain) + 
   labs(x = "Time (day)", y = "Activity")
@@ -134,7 +136,7 @@ ggplot(strain_normalized.df) + aes(x = factor(day), y = norm.act) + ylim(0, 100)
 ```
 
 
-```{r, warning = F, message = F, echo = F}
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
 summary.df <- well_normalized.df
 summary.df <- summary.df %>%
@@ -151,23 +153,23 @@ save(summary.df, file = paste(data.loc, "/", experiment, "_Summary.Rda", sep = "
 
 ## Summary Data
 
-```{r Summary, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Summary, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-comparison_plot <- ggplot(summary.df) + geom_line(aes(x = day, y = norm.act)) + facet_wrap( ~ strain) +
+ggplot(summary.df) + geom_line(aes(x = day, y = norm.act)) + facet_wrap( ~ strain) + ylim(0, 100) +
   labs(x = "Time (day)", y = "Activity")
 
 ```
 
 ## Plate Distribution
 
-```{r Plate_Dist, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Plate_Dist, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(cleaned.df) + aes(x = factor(day), y = activity) + geom_boxplot() + labs(x = "Time (day)", y = "Activity")
 
 ```
 
 
-```{r, warning = F, message = F, echo = F}
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
 plate.df <- cleaned.df 
 plate.df <- plate.df %>%
@@ -183,7 +185,7 @@ save(plate.df, file = paste(data.loc, "/", experiment, "_Plate.Rda", sep = ""), 
 
 ## Plate Data
 
-```{r Plate, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Plate, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(plate.df) + aes(x = day, y= norm.act) + geom_line() + ylim(0, 100) + labs(x = "Time (day)", y = "Activity")
 
@@ -191,41 +193,7 @@ ggplot(plate.df) + aes(x = day, y= norm.act) + geom_line() + ylim(0, 100) + labs
 
 ## Curve Fitting
 
-```{r, warning = F, message = F, echo = F}
-
-well_gompertz <- function(input, df, row, strain) {
-  sum(((100 * 100 ^ ((input[1] / input[2]) * (1 - exp(input[2] * df$day[df$row == row & df$strain == strain])))) - df$norm.act[df$row == row & df$strain == strain]) ^ 2)
-}
-
-strain_gompertz <- function(input, df, strain) {
-  sum(((100 * 100 ^ ((input[1] / input[2]) * (1 - exp(input[2] * df$day[df$strain == strain])))) - df$norm.act[df$strain == strain]) ^ 2)
-}
-
-well_weibull <- function(input, df, row, strain) {
-  sum(((100 * 100 ^ (-((df$day[df$row == row & df$strain == strain] / input[2]) ^ input[1]))) - df$norm.act[df$row == row & df$strain == strain]) ^ 2)
-}
-
-strain_weibull <- function(input, df, strain) {
-  sum(((100 * 100 ^ (-((df$day[df$strain == strain] / input[2]) ^ input[1]))) - df$norm.act[df$strain == strain]) ^ 2)
-}
-
-well_twoplog <- function(input, df, row, strain) {
-  sum(((100 / (1 + ((df$day[df$row == row & df$strain == strain] / input[2]) ^ input[1]))) - df$norm.act[df$row == row & df$strain == strain]) ^ 2)
-}
-
-strain_twoplog <- function(input, df, strain) {
-  sum(((100 / (1 + ((df$day[df$strain == strain] / input[2]) ^ input[1]))) - df$norm.act[df$strain == strain]) ^ 2)
-}
-
-well_threeplog <- function(input, df, row, strain) {
-  sum(((100 * 100 ^ (-input[2] * df$day[df$row == row & df$strain == strain] - (input[2] / input[3]) * ln((input[1] - (input[2] - input[1]) * exp(-input[3] * df$day[df$row == row & df$strain == strain])) / input[2]))) - df$norm.act[df$row == row & df$strain == strain]) ^ 2)
-}
-
-strain_threeplog <- function(input, df, strain) {
-  sum(((100 * 100 ^ (-input[2] * df$day[df$strain == strain] - (input[2] / input[3]) * ln((input[1] - (input[2] - input[1]) * exp(-input[3] * df$day[df$strain == strain])) / input[2]))) - df$norm.act[df$strain == strain]) ^ 2)
-}
-
-twoplog2 <- formula(norm.act ~ 100/(1 + ((day / b) ^ c)))
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
 well_params.df <- data.frame(strain = rep(levels(factor(combined.df$strain)), each = length(levels(factor(combined.df$row)))), row = rep(levels(factor(combined.df$row)), length(levels(factor(combined.df$strain)))), bparam = rep(0, length(strains) * replicates), cparam = rep(0, length(strains) * replicates))
 
@@ -266,7 +234,7 @@ print(strain_params.df)
 ```
 
 
-```{r, warning = F, message = F, echo = F}
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
 times <- 1:length(levels(factor(summary.df$day)))
 
@@ -274,21 +242,90 @@ draw_twoplog <- function(bparam, cparam) {
   return((100 / (1 + ((times / cparam) ^ bparam))))
 }
 
-survivals.df <- data.frame(CB4856 = draw_twoplog(strain_params.df$bparam[strain_params.df$strain == "CB4856"], strain_params.df$cparam[strain_params.df$strain == "CB4856"]), CX11314 = draw_twoplog(strain_params.df$bparam[strain_params.df$strain == "CX11314"], strain_params.df$cparam[strain_params.df$strain == "CX11314"]), ED3017 = draw_twoplog(strain_params.df$bparam[strain_params.df$strain == "ED3017"], strain_params.df$cparam[strain_params.df$strain == "ED3017"]), JT11398 = draw_twoplog(strain_params.df$bparam[strain_params.df$strain == "JT11398"], strain_params.df$cparam[strain_params.df$strain == "JT11398"]), DL238 = draw_twoplog(strain_params.df$bparam[strain_params.df$strain == "DL238"], strain_params.df$cparam[strain_params.df$strain == "DL238"]), N2 = draw_twoplog(strain_params.df$bparam[strain_params.df$strain == "N2"], strain_params.df$cparam[strain_params.df$strain == "N2"]), MY23 = draw_twoplog(strain_params.df$bparam[strain_params.df$strain == "MY23"], strain_params.df$cparam[strain_params.df$strain == "MY23"]), JU258 = draw_twoplog(strain_params.df$bparam[strain_params.df$strain == "JU258"], strain_params.df$cparam[strain_params.df$strain == "JU258"]), EG4725 = draw_twoplog(strain_params.df$bparam[strain_params.df$strain == "EG4725"], strain_params.df$cparam[strain_params.df$strain == "EG4725"]), LKC34 = draw_twoplog(strain_params.df$bparam[strain_params.df$strain == "LKC34"], strain_params.df$cparam[strain_params.df$strain == "LKC34"]), JU775 = draw_twoplog(strain_params.df$bparam[strain_params.df$strain == "JU775"], strain_params.df$cparam[strain_params.df$strain == "JU775"]), MY16 = draw_twoplog(strain_params.df$bparam[strain_params.df$strain == "MY16"], strain_params.df$cparam[strain_params.df$strain == "MY16"])) %>% gather(strain, yvalue, 1:12)
+strain_survivals.df <- data.frame(day = times)
 
-fits.df <- summary.df
-fits.df$yvalue <- survivals.df$yvalue
+l <- 2
 
+for (x in levels(factor(summary.df$strain))) {
+    strain_survivals.df[l] <- draw_twoplog(strain_params.df$bparam[strain_params.df$strain == x], strain_params.df$cparam[strain_params.df$strain == x])
+    l <- l + 1
+}
 
-save(fits.df, file = paste(data.loc, "/", experiment, "_Fits.Rda", sep = ""), ascii = TRUE)
+strain_survivals.df <- strain_survivals.df %>% gather(strain, yvalue, 2:13)
+strain_survivals.df$strain <- c(rep(strains, each = length(times)))
+
+strain_fits.df <- summary.df
+strain_fits.df$yvalue <- strain_survivals.df$yvalue
+
+for (i in 1:length(strain_fits.df$yvalue)) {
+  if (is.na(strain_fits.df$norm.act[i]) == TRUE) {
+    strain_fits.df$yvalue[i] <- NA
+  }
+}
+
+save(strain_fits.df, file = paste(data.loc, "/", experiment, "_Strain_Fits.Rda", sep = ""), ascii = TRUE)
 
 ```
 
 ## 2 Parameter Logistic Function Fits by Strain
 
-```{r Fits, warning = F, message = F, echo = F, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Strain_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(fits.df) + geom_line(aes(x = day, y = norm.act)) + ylim(0, 100) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ strain)
+ggplot(strain_fits.df) + geom_line(aes(x = day, y = norm.act)) + ylim(0, 100) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ strain)
 
 ```
 
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+times <- 1:length(levels(factor(combined.df$day)))
+
+draw_twoplog <- function(bparam, cparam) {
+  return((100 / (1 + ((times / cparam) ^ bparam))))
+}
+
+well_survivals.df <- data.frame(day = times)
+
+l <- 2
+
+for (x in levels(factor(combined.df$strain))) {
+  for (y in levels(factor(combined.df$row))) {
+    well_survivals.df[l] <- draw_twoplog(well_params.df$bparam[well_params.df$strain == x & well_params.df$row == y], well_params.df$cparam[well_params.df$strain == x & well_params.df$row == y])
+    l <- l + 1
+  }
+}
+
+well_survivals.df <- well_survivals.df %>% gather(strain, yvalue, 2:97)
+well_survivals.df$strain <- c(rep(strains, each = replicates * length(times)))
+well_survivals.df$row <- rep(rep(c("A", "B", "C", "D", "E", "F", "G", "H"), each = length(times)), nstrains)
+
+well_fits.df <- combined.df
+well_fits.df$yvalue <- well_survivals.df$yvalue
+
+for (i in 1:length(well_fits.df$yvalue)) {
+  if (is.na(well_fits.df$norm.act[i]) == TRUE) {
+    well_fits.df$yvalue[i] <- NA
+  }
+}
+
+save(well_fits.df, file = paste(data.loc, "/", experiment, "_Well_Fits.Rda", sep = ""), ascii = TRUE)
+
+```
+
+## 2 Parameter Logistic Function Fits by Well
+
+```{r Well_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(well_fits.df) + geom_line(aes(x = day, y = norm.act)) + ylim(0, 100) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(row ~ strain)
+
+```
+
+
+## Implementing NLS
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+#nlsSummary.df <- data.frame(day = summary.df$day[summary.df$strain == "CX11314"], norm.act = summary.df$norm.act[summary.df$strain == "CX11314"])
+#nlsTest <- nls(norm.act ~ SSlogis(day, Asym, xmid, scal), nlsSummary.df)
+#nlm(strain_twoplog, c(1, coef(nlsTest)[["xmid"]]), summary.df, "CX11314")
+
+```
