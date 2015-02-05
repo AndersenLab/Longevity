@@ -6,7 +6,7 @@ plateID <- "Longevity_1_4"
 strains <- c("CB4856", "CX11314", "ED3017", "JT11398", "DL238", "N2", "MY23", "JU258", "EG4725",  "LKC34", "JU775", "MY16")
 nstrains <- length(strains)
 colRemove <- c(5, 6)
-wellRemove <- data.frame(col = c(), row = c())
+wellRemove <- data.frame(col = c(3), row = c("A"))
 #levels(wellRemove$row) <- c("A", "B", "C", "D", "E", "F", "G", "H")
 
 #bin_size <- as.numeric(str_split(read.delim(file = data.loc, head = FALSE, skip = 5)[1, ], " ")[[1]][2])
