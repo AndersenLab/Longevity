@@ -144,6 +144,26 @@ ggplot(well.df) + aes(x = day, y = total.activity) + geom_line() + facet_grid(ro
 
 ```
 
+## Setting Top of Curve by Well ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+well.df <- well.df %>%
+  group_by(strain, row) %>%
+  mutate(max.sum = day[which.max(norm.act)[1]]) %>%
+  group_by(row) %>%
+  mutate(adjusted.activity = ifelse(day < max.sum, 100, norm.act))
+well.df <- ungroup(well.df)
+  
+```
+
+```{r Well_Adjusted, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(well.df) + aes(x = day, y = adjusted.activity) + geom_line() + facet_grid(row ~ strain) +
+  labs(x = "Time (day)", y = "Adjusted Activity")
+
+```
+
 ## Well Normalized Data ##
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
@@ -172,7 +192,7 @@ ggplot(well.df) + aes(x = day, y = norm.act) + ylim(0, 100) + geom_line() + face
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
-well_params.df <- data.frame(strain = rep(levels(factor(well.df$strain)), each = length(levels(factor(well.df$row)))), row = rep(levels(factor(well.df$row)), length(levels(factor(well.df$strain)))), bparam = rep(0, length(strains) * replicates), cparam = rep(0, length(strains) * replicates))
+well_params.df <- data.frame(strain = rep(levels(well.df$strain), each = length(levels(well.df$row))), row = rep(levels(well.df$row), length(levels(well.df$strain))), bparam = rep(0, length(strains) * replicates), cparam = rep(0, length(strains) * replicates))
 
 l = 1
 
@@ -197,7 +217,7 @@ print(well_params.df)
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
-times <- 1:length(levels(factor(well.df$day)))
+times <- 1:length(levels(well.df$day))
 
 draw_twoplog <- function(bparam, cparam) {
   return((100 / (1 + ((times / cparam) ^ bparam))))
@@ -207,8 +227,8 @@ well_survivals.df <- data.frame(day = times)
 
 l <- 2
 
-for (x in levels(factor(well.df$strain))) {
-  for (y in levels(factor(well.df$row))) {
+for (x in levels(well.df$strain)) {
+  for (y in levels(well.df$row)) {
     well_survivals.df[l] <- draw_twoplog(well_params.df$bparam[well_params.df$strain == x & well_params.df$row == y], well_params.df$cparam[well_params.df$strain == x & well_params.df$row == y])
     l <- l + 1
   }
@@ -303,15 +323,36 @@ ggplot(strain.df) + aes(x = day, y = norm.act) + ylim(0, 100) + geom_line() + fa
 
 ```
 
+## Setting Top of Curve by Strain ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+#strain_test.df <- strain.df %>%
+#  group_by(strain) %>%
+#  mutate(max.sum = day[which.max(norm.act)[1]]) %>%
+#  group_by(strain) %>%
+#  mutate(adjusted.activity = ifelse(day < max.sum, 100, norm.act))
+
+#strain_test.df <- ungroup(strain_test.df)
+
+```
+
+```{r Strain_Adjusted, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(strain.df) + aes(x = day, y = adjusted.activity) + geom_line() + facet_grid(row ~ strain) +
+  labs(x = "Time (day)", y = "Adjusted Activity")
+
+```
+
 ## Strain Curve Fitting ##
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
-strain_params.df <- data.frame(strain = levels(factor(strain.df$strain)), bparam = rep(0, length(strains)), cparam = rep(0, length(strains)))
+strain_params.df <- data.frame(strain = levels(strain.df$strain), bparam = rep(0, length(strains)), cparam = rep(0, length(strains)))
 
 l = 1
 
-for (x in levels(factor(strain.df$strain))) {
+for (x in levels(strain.df$strain)) {
   if(!(is.na(strain.df$norm.act[strain.df$strain == x]))[1] == TRUE) {
     temp <- nlm(strain_twoplog, c(2, 2), strain.df, x)[["estimate"]]
     strain_params.df$bparam[l] <- temp[1]
@@ -330,7 +371,7 @@ print(strain_params.df)
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
-times <- 1:length(levels(factor(strain.df$day)))
+times <- 1:length(levels(strain.df$day))
 
 draw_twoplog <- function(bparam, cparam) {
   return((100 / (1 + ((times / cparam) ^ bparam))))
@@ -340,7 +381,7 @@ strain_survivals.df <- data.frame(day = times)
 
 l <- 2
 
-for (x in levels(factor(strain.df$strain))) {
+for (x in levels(strain.df$strain)) {
     strain_survivals.df[l] <- draw_twoplog(strain_params.df$bparam[strain_params.df$strain == x], strain_params.df$cparam[strain_params.df$strain == x])
     l <- l + 1
 }
