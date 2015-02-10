@@ -144,26 +144,6 @@ ggplot(well.df) + aes(x = day, y = total.activity) + geom_line() + facet_grid(ro
 
 ```
 
-## Setting Top of Curve by Well ##
-
-```{r, warning = FALSE, message = FALSE, echo = FALSE}
-
-well.df <- well.df %>%
-  group_by(strain, row) %>%
-  mutate(max.sum = day[which.max(norm.act)[1]]) %>%
-  group_by(row) %>%
-  mutate(adjusted.activity = ifelse(day < max.sum, 100, norm.act))
-well.df <- ungroup(well.df)
-  
-```
-
-```{r Well_Adjusted, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
-
-ggplot(well.df) + aes(x = day, y = adjusted.activity) + geom_line() + facet_grid(row ~ strain) +
-  labs(x = "Time (day)", y = "Adjusted Activity")
-
-```
-
 ## Well Normalized Data ##
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
@@ -185,6 +165,26 @@ save(well.df, file = paste(data.loc, "/", experiment, "_Well.Rda", sep = ""), as
 
 ggplot(well.df) + aes(x = day, y = norm.act) + ylim(0, 100) + geom_line() + facet_grid(row ~ strain) +
   labs(x = "Time (day)", y = "Normalized Activity")
+
+```
+
+## Setting Top of Curve by Well ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+well.df <- well.df %>%
+  group_by(strain, row) %>%
+  mutate(max.sum = day[which.max(norm.act)[1]]) %>%
+  group_by(row) %>%
+  mutate(adjusted.activity = ifelse(day < max.sum, 100, norm.act))
+well.df <- ungroup(well.df)
+  
+```
+
+```{r Well_Adjusted, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(well.df) + aes(x = day, y = adjusted.activity) + geom_line() + facet_grid(row ~ strain) +
+  labs(x = "Time (day)", y = "Adjusted Activity")
 
 ```
 
@@ -330,17 +330,21 @@ ggplot(strain.df) + aes(x = day, y = norm.act) + ylim(0, 100) + geom_line() + fa
 #strain_test.df <- strain.df %>%
 #  group_by(strain) %>%
 #  mutate(max.sum = day[which.max(norm.act)[1]]) %>%
-#  group_by(strain) %>%
 #  mutate(adjusted.activity = ifelse(day < max.sum, 100, norm.act))
 
 #strain_test.df <- ungroup(strain_test.df)
+
+#for (i in 1:length(strain_test.df$strain)) {
+#  print(i)
+#  print(ifelse(strain_test.df$day[i] < strain_test.df$max.sum[i], 100, strain_test.df$norm.act[i]))
+#}
 
 ```
 
 ```{r Strain_Adjusted, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(strain.df) + aes(x = day, y = adjusted.activity) + geom_line() + facet_grid(row ~ strain) +
-  labs(x = "Time (day)", y = "Adjusted Activity")
+#ggplot(strain.df) + aes(x = day, y = adjusted.activity) + geom_line() + facet_grid(row ~ strain) +
+#  labs(x = "Time (day)", y = "Adjusted Activity")
 
 ```
 
