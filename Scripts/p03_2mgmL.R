@@ -1,4 +1,4 @@
-# Example input file to Longevity R Markdown
+# Input file to Longevity R Markdown
 
 replicates <- 8
 num_bins <- 5
@@ -9,8 +9,5 @@ colRemove <- c(1, 3, 5, 6, 10, 12)
 wellRemove <- data.frame(col = c(), row = c())
 #levels(wellRemove$row) <- c("A", "B", "C", "D", "E", "F", "G", "H")
 
-#bin_size <- as.numeric(str_split(read.delim(file = data.loc, head = FALSE, skip = 5)[1, ], " ")[[1]][2])
-#time <- as.numeric(str_split(read.delim(file = data.loc, head = FALSE, skip = 5)[1, ], " ")
-#                   [[1]][length(str_split(read.delim(file = data.loc, head = FALSE, skip = 5)[1, ], " ")[[1]])])
-#num_groups <- find_num_groups(data.loc)
-#num_bins <- time / bin_size
+files <- dir(path = data.loc, plateID, full.names = TRUE)
+

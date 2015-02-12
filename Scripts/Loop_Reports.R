@@ -1,7 +1,7 @@
 library(knitr)
 
-#add function to determine the number of trials and/or food concentration tests
-#files <- dir(path = , plateID, full.names = T)
+## NOTE!! THIS IS CURRENTLY BROKEN DUE TO CHANGES TO MAKE ##
+## Loop_Reports_Alt.R WORK!!!                             ##
 
 trials <- 1:3
 food_conc <- 2:4
@@ -14,7 +14,7 @@ for (i in 1:length(conditions$trials)) {
   j <- conditions$trials[i]
   k <- conditions$food_conc[i]
   knit2html("./Scripts/Food_Optimization_Longevity_Report.Rmd", 
-            output = paste("./Results/p0", j, "_", k, "mgmL_Report.html", sep=""),
+            output = paste("./Results/p0", j, "_", k, "mgmL_Report.html", sep = ""),
             stylesheet = "./Scripts/foghorn_edited.css")
 }
 
@@ -25,6 +25,6 @@ for (i in 1:length(food_conc)) {
   j <- 3
   k <- food_conc[i]
   knit2html("./Scripts/Food_Optimization_Longevity_Report.Rmd", 
-            output = paste("./Results/p0", j, "_", k, "mgmL_Report.html", sep=""),
+            output = paste("./Results/p0", j, "_", k, "mgmL_Report.html", sep = ""),
             stylesheet = "./Scripts/foghorn_edited.css")
 }

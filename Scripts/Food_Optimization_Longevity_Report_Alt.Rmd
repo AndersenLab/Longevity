@@ -1,0 +1,397 @@
+---
+title: "Analysis of Longevity"
+author: "Ryan Abdella"
+date: "January 15, 2015"
+output:
+  html_document:
+    css: ~/Github/Food-Optimization/Scripts/Food_Optimization/Scripts/foghorn_edited.css
+---
+
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+library("plyr")
+library("dplyr")
+library("ggplot2")
+library("tidyr")
+
+data.loc <- paste("../Data/Raw/", experiment_name, "/", sep = "")
+source("./wMT_fxns_alt.R")
+source("./survival_fxns.R")
+source(paste("./", experiment_name, ".R", sep = ""))
+
+paste(experiment_name)
+
+```
+ 
+## Raw Activity ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+## Pull in all the files associated with the current experiment  ##
+## and create a data frame containing all the raw data.          ##
+## Regroup data frame so that it's ordered by strain, replicate, ##
+## and day. Add in strain information.                           ##
+
+files <- dir(path = data.loc, plateID, full.names = TRUE)
+
+## Need to change to using dplyr instead of plyr. ##
+
+raw.df <- ldply(files, processMicrotrackerReport) %>% filter(time < num_bins * 2 + 1)
+raw.df$day <- rep(1:(length(files)), each = nstrains * replicates * num_bins)
+
+save(raw.df, file = paste(data.loc, "/", experiment_name, "_Raw.Rda", sep = ""), ascii = TRUE)
+
+data.df <- raw.df[order(raw.df$col, raw.df$row, raw.df$day), ]
+
+data.df$strain <- factor(data.df$col, labels = strains)
+
+save(data.df, file = paste(data.loc, "/", experiment_name, "_Processed.Rda", sep = ""), ascii = TRUE)
+
+```
+
+```{r Raw, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment_name, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(data.df) + aes(x = day, y = activity) + geom_point() + facet_grid(row ~ strain) +
+  labs(x = "Time (day)", y = "Raw Activity")
+
+```
+
+## Cleaned Data ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+## Remove both columns and individual wells that were contaminated. ##
+
+cleaned.df <- data.df
+cleaned.df$activity[(data.df$col %in% colRemove)] <- NA
+for(i in 1:length(wellRemove$row)) {
+  cleaned.df$activity[cleaned.df$row == wellRemove$row[i] & cleaned.df$col == wellRemove$col[i]] <- NA
+  }
+
+save(cleaned.df, file = paste(data.loc, "/", experiment_name, "_Cleaned.Rda", sep = ""), ascii = TRUE)
+
+```
+
+```{r Cleaned, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment_name, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(cleaned.df) + aes(x = factor(day), y = activity) + geom_boxplot() + facet_grid(row ~ strain) +
+  labs(x= "Time (day)", y = "Raw Activity")
+
+```
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+well.df <- cleaned.df %>%
+  group_by(strain, row, day) %>%
+  summarize(mean.activity = mean(activity), 
+            sd.activity = sd(activity), 
+            median.activity = median(activity, na.rm = TRUE), 
+            total.activity = sum(activity))
+
+well.df <- ungroup(well.df)
+
+```
+
+## Well Mean Data ##
+
+```{r Well_Mean, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment_name, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(well.df) + geom_line(aes(x = day, y = mean.activity)) + 
+  geom_errorbar(aes(x = day, ymin = mean.activity - sd.activity, ymax = mean.activity + sd.activity)) + 
+  facet_grid(row ~ strain) + labs(x = "Time (day)", y = "Mean Activity")
+
+```
+
+## Well Median Data ##
+
+```{r Well_Median, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment_name, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(well.df) + aes(x = day, y = median.activity) + geom_line() + facet_grid(row ~ strain) +
+  labs(x = "Time (day)", y = "Median Activity")
+
+```
+
+## Well Total Data ##
+
+```{r Well_Total, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment_name, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(well.df) + aes(x = day, y = total.activity) + geom_line() + facet_grid(row ~ strain) +
+  labs(x = "Time (day)", y = "Aggregate Activity")
+
+```
+
+## Well Normalized Data ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+## Normalize activity data by the maximum activity of each well. ##
+## NEED TO ADD NORMALIZING BY THE NUMBER OF WORMS SORTED.        ##
+
+well.df <- well.df %>%
+  group_by(strain, row) %>%
+  mutate(norm.act = 100 * total.activity / max(total.activity, na.rm = TRUE))
+
+well.df <- ungroup(well.df)
+
+save(well.df, file = paste(data.loc, "/", experiment_name, "_Well.Rda", sep = ""), ascii = TRUE)
+
+```
+
+```{r Well_Normalized, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment_name, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(well.df) + aes(x = day, y = norm.act) + ylim(0, 100) + geom_line() + facet_grid(row ~ strain) +
+  labs(x = "Time (day)", y = "Normalized Activity")
+
+```
+
+## Setting Top of Curve by Well ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+well.df <- well.df %>%
+  group_by(strain, row) %>%
+  mutate(max.sum = day[which.max(norm.act)[1]]) %>%
+  group_by(row) %>%
+  mutate(adjusted.activity = ifelse(day < max.sum, 100, norm.act))
+well.df <- ungroup(well.df)
+  
+```
+
+```{r Well_Adjusted, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment_name, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(well.df) + aes(x = day, y = adjusted.activity) + geom_line() + facet_grid(row ~ strain) +
+  labs(x = "Time (day)", y = "Adjusted Activity")
+
+```
+
+## Well Curve Fitting ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+well_params.df <- data.frame(strain = rep(levels(well.df$strain), each = length(levels(well.df$row))), row = rep(levels(well.df$row), length(levels(well.df$strain))), bparam = rep(0, length(strains) * replicates), cparam = rep(0, length(strains) * replicates))
+
+l = 1
+
+for (x in levels(well.df$strain)) {
+  for (y in levels(well.df$row)) {
+    if (!(is.na(well.df$norm.act[well.df$row == y & well.df$strain == x]))[1] == TRUE) {
+      temp <- nlm(well_twoplog, c(2, 1), well.df, y, x)[["estimate"]]
+      well_params.df$bparam[l] <- temp[1]
+      well_params.df$cparam[l] <- temp[2]
+      }
+    l = l + 1
+    }
+  }
+
+save(well_params.df, file = paste(data.loc, "/", experiment_name, "_Well_Params.Rda", sep = ""), ascii = TRUE)
+
+print(well_params.df)
+
+```
+
+## 2 Parameter Logistic Function Fits by Well ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+times <- 1:length(levels(factor(well.df$day)))
+
+draw_twoplog <- function(bparam, cparam) {
+  return((100 / (1 + ((times / cparam) ^ bparam))))
+}
+
+well_survivals.df <- data.frame(day = times)
+
+l <- 2
+
+for (x in levels(well.df$strain)) {
+  for (y in levels(well.df$row)) {
+    well_survivals.df[l] <- draw_twoplog(well_params.df$bparam[well_params.df$strain == x & well_params.df$row == y], well_params.df$cparam[well_params.df$strain == x & well_params.df$row == y])
+    l <- l + 1
+  }
+}
+
+well_survivals.df <- well_survivals.df %>% gather(strain, yvalue, 2:97)
+well.df$yvalue <- well_survivals.df$yvalue
+
+for (i in 1:length(well.df$yvalue)) {
+  if (is.na(well.df$norm.act[i]) == TRUE) {
+    well.df$yvalue[i] <- NA
+  }
+}
+
+```
+
+```{r Well_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment_name, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(well.df) + geom_line(aes(x = day, y = norm.act)) + ylim(0, 100) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(row ~ strain)
+
+```
+
+## Strain Mean Data ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+## Let's look at the mean and standard deviation of the ##
+## data per strain.                                     ##
+
+strain.df <- well.df %>%
+  group_by(strain, day) %>%
+  summarise(mean.activity = mean(total.activity, na.rm = TRUE), 
+            sd.activity = sd(total.activity, na.rm = TRUE), 
+            median.activity = median(total.activity, na.rm = TRUE), 
+            total.activity = sum(total.activity, na.rm = TRUE))
+
+strain.df <- ungroup(strain.df)
+
+for (i in 1:length(strain.df$total.activity)) {
+  if (strain.df$total.activity[i] == 0) {
+    strain.df$total.activity[i] <- NA
+  }
+  if (!is.finite(strain.df$mean.activity[i])) {
+    strain.df$mean.activity[i] <- NA
+  }
+  if (!is.finite(strain.df$sd.activity[i])) {
+    strain.df$sd.activity[i] <- NA
+  }
+}
+
+```
+
+```{r Strain_Mean, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment_name, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(strain.df) + geom_line(aes(x = day, y = mean.activity)) + 
+  geom_errorbar(aes(x = day, ymin = mean.activity - sd.activity, ymax = mean.activity + sd.activity)) + 
+  facet_wrap( ~ strain) + labs(x = "Time (day)", y = "Mean Activity")
+
+```
+
+## Strain Median Data ##
+
+```{r Strain_Median, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment_name, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(strain.df) + aes(x = day, y = median.activity) + geom_line() + facet_wrap( ~ strain) +
+  labs(x = "Time (day)", y = "Median Activity")
+
+```
+
+## Strain Total Data ##
+
+```{r Strain_Total, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment_name, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(strain.df) + aes(x = day, y = total.activity) + geom_line() + facet_wrap( ~ strain) +
+  labs(x = "Time (day)", y = "Activity")
+
+```
+
+## Strain Normalized Data ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+strain.df <- strain.df %>%
+  group_by(strain) %>%
+  mutate(norm.act = 100 * total.activity / max(total.activity, na.rm = TRUE))
+
+strain.df <- ungroup(strain.df)
+
+```
+
+```{r Strain_Normalized, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment_name, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(strain.df) + aes(x = day, y = norm.act) + ylim(0, 100) + geom_line() + facet_wrap( ~ strain) + 
+  labs(x = "Time (day)", y = "Normalized Activity")
+
+```
+
+## Setting Top of Curve by Strain ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+strain.df <- strain.df %>%
+  group_by(strain) %>%
+  mutate(max.sum = day[which.max(norm.act)[1]]) #%>%
+  #mutate(adjusted.activity = ifelse(day < max.sum, 100, norm.act))
+
+strain.df <- ungroup(strain.df)
+strain.df$adjusted.activity <- rep(0, length(strain.df$day))
+
+for (i in 1:length(strain.df$strain)) {
+  strain.df$adjusted.activity[i] <- ifelse(strain.df$day[i] < strain.df$max.sum[i], 100, strain.df$norm.act[i])
+}
+
+```
+
+```{r Strain_Adjusted, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment_name, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+#ggplot(strain.df) + aes(x = day, y = adjusted.activity) + geom_line() + facet_grid(row ~ strain) +
+#  labs(x = "Time (day)", y = "Adjusted Activity")
+
+```
+
+## Strain Curve Fitting ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+strain_params.df <- data.frame(strain = levels(strain.df$strain), bparam = rep(0, length(strains)), cparam = rep(0, length(strains)))
+
+l = 1
+
+for (x in levels(strain.df$strain)) {
+  if(!(is.na(strain.df$norm.act[strain.df$strain == x]))[1] == TRUE) {
+    temp <- nlm(strain_twoplog, c(2, 2), strain.df, x)[["estimate"]]
+    strain_params.df$bparam[l] <- temp[1]
+    strain_params.df$cparam[l] <- temp[2]
+  }
+  l = l + 1
+}
+
+save(strain_params.df, file = paste(data.loc, "/", experiment_name, "_Strain_Params.Rda", sep = ""), ascii = TRUE)
+
+print(strain_params.df)
+
+```
+
+## 2 Parameter Logistic Function Fits by Strain ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+times <- 1:length(levels(factor(strain.df$day)))
+
+strain_survivals.df <- data.frame(day = times)
+
+l <- 2
+
+for (x in levels(strain.df$strain)) {
+    strain_survivals.df[l] <- draw_twoplog(strain_params.df$bparam[strain_params.df$strain == x], strain_params.df$cparam[strain_params.df$strain == x])
+    l <- l + 1
+}
+
+strain_survivals.df <- strain_survivals.df %>% gather(strain, yvalue, 2:13)
+
+strain.df$yvalue <- strain_survivals.df$yvalue
+
+for (i in 1:length(strain.df$yvalue)) {
+  if (is.na(strain.df$norm.act[i]) == TRUE) {
+    strain.df$yvalue[i] <- NA
+  }
+}
+
+```
+
+```{r Strain_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experiment_name, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(strain.df) + geom_line(aes(x = day, y = norm.act)) + ylim(0, 100) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ strain)
+
+```
+
+## Implementing NLS ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+## This should only be necessary if the curve fits to the data are not accurate at all. ##
+
+#nlsSummary.df <- data.frame(day = summary.df$day[summary.df$strain == "CX11314"], norm.act = summary.df$norm.act[summary.df$strain == "CX11314"])
+#nlsTest <- nls(norm.act ~ SSlogis(day, Asym, xmid, scal), nlsSummary.df)
+#nlm(strain_twoplog, c(1, coef(nlsTest)[["xmid"]]), summary.df, "CX11314")
+
+```
