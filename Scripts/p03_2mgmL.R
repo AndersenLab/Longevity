@@ -8,6 +8,3 @@ nstrains <- length(strains)
 colRemove <- c(1, 3, 5, 6, 10, 12)
 wellRemove <- data.frame(col = c(), row = c())
 #levels(wellRemove$row) <- c("A", "B", "C", "D", "E", "F", "G", "H")
-
-files <- dir(path = data.loc, plateID, full.names = TRUE)
-

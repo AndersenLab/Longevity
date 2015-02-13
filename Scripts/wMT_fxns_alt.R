@@ -1,14 +1,11 @@
-files <- dir(path = data.loc, plateID, full.names = TRUE)
+## This document contains functions for processing the information from the wMicrotracker report files. ##
+## It is an updated version compared to wMT_fxns.R that adds an extra step in order to make sure that   ##
+## report files will be compatible before analyzing.                                                    ##
+## By: Ryan Abdella on 2015-02-12                                                                       ##
 
-time_vector <- function(time, bin_size, num_bins) {
-  times <- vector()
-  for (i in 1:num_bins) {
-    times <- c(times, (i * bin_size))
-  }
-  return(times)
-}
+# Determines the number of groups from a wMicrotracker Report file #######################################
 
-find_num_groups <- function(file) {
+findNumGroups <- function(file) {
   #for (i in 1:length(read.delim(file = file, head = F, skip = 5)[[1]]))
   i <- 1
   while (str_split(read.delim(file, head = FALSE, skip = 6, blank.lines.skip = FALSE)[i,], " ")[[1]][1] != "") {
@@ -17,41 +14,27 @@ find_num_groups <- function(file) {
   return (i - 1)
 }
 
-## Pulls out information from wMicrotracker Report file ##
+# Pulls out information from wMicrotracker Report file ###################################################
 
 processMicrotrackerReport <- function(file) {
-  bin_size <- as.numeric(str_split(read.delim(file = file, head = FALSE, skip = 5)[1, ], " ")[[1]][2])
-  time <- as.numeric(str_split(read.delim(file = file, head = FALSE, skip = 5)[1, ], " ")[[1]][length(str_split(read.delim(file = file, head = FALSE, skip = 5)[1, ], " ")[[1]])])
-  num_groups <- find_num_groups(file)
-  num_bins <- time / bin_size
-  num <- as.numeric(str_split_fixed(read.delim(file = file, head = FALSE, skip = 6)[1:num_groups, ], " ", 
-                                    (num_bins + 1))[ , 2:(num_bins + 1)])
-  experiment_conditions <- data.frame(bin_size = bin_size, time = time, num_groups = num_groups, num_bins = num_bins, num = num)
-  return(experiment_conditions)
+  timeString <- str_split(read.delim(file = file, head = FALSE, skip = 5)[1, ], " ")[[1]][-1]
+  binSize <- as.numeric(timeString[1])
+  time <- as.numeric(timeString[length(timeString)])
+  numGroups <- findNumGroups(file)
+  numBins <- time / binSize
+  num <- as.numeric(str_split_fixed(read.delim(file = file, head = FALSE, skip = 6)[1:numGroups, ], " ", (numBins + 1))[ , 2:(numBins + 1)])
+  experimentConditions <- data.frame(binSize = binSize, time = time, numGroups = numGroups, numBins = numBins, num = num)
+  return(experimentConditions)
 }
 
-## Generates the data frame that will be used in the markdown document ##
+# Generates the data frame that will be used in the RMarkdown document ###################################
 
-generateDataFrameFromFile <- function(experiment_conditions) {
-  full <- data.frame(row = rep(rep(c("A", "B", "C", "D", "E", "F", "G", "H"), 12), experiment_conditions$num_bins[1]),
-                     col = rep(rep(1:12, each = 8), experiment_conditions$num_bins[1]),
-                     time = rep(time_vector(experiment_conditions$time[1], experiment_conditions$bin_size[1], experiment_conditions$num_bins[1]), each = experiment_conditions$num_groups[1]),
-                     activity = experiment_conditions$num)
+generateDataFrameFromFile <- function(experimentConditions) {
+  full <- data.frame(row = rep(rep(c("A", "B", "C", "D", "E", "F", "G", "H"), 12), experimentConditions$numBins[1]),
+                     col = rep(rep(1:12, each = 8), experimentConditions$numBins[1]),
+                     time = rep(seq(from = experimentConditions$binSize[1],
+                                    to = experimentConditions$time[1],
+                                    step = experimentConditions$binSize[1]), each = experimentConditions$numGroups[1]),
+                     activity = experimentConditions$num)
   return(full)
-}
-
-getBinSize <- function(df) {
-  return(df$bin_size)
-}
-
-getTime <- function(df) {
-  return(df$time)
-}
-
-getNumGroups <- function(df) {
-  return(df$num_groups)
-}
-
-getNumBins <- function(df) {
-  return(df$num_bins)
 }
