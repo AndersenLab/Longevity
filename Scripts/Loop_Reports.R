@@ -1,27 +1,24 @@
-library(knitr)
+## Alternate Loop Reports ##
 
-trials <- 1:3
-food_conc <- 2:4
+library("knitr")
+library("stringr")
+library("plyr")
+library("dplyr")
+library("ggplot2")
+library("tidyr")
 
-conditions <- data.frame(trials = rep(trials, each = length(food_conc)), food_conc = rep(food_conc, length(trials)))
+experiments.file <- dir(path = "./Scripts", "mgmL", full.names = TRUE)
 
-## To update all reports use this loop. ##
-
-for (i in 1:length(conditions$trials)) {
-  j <- conditions$trials[i]
-  k <- conditions$food_conc[i]
-  knit2html("./Scripts/Food_Optimization_Longevity_Report.Rmd", 
-            output = paste("./Results/p0", j, "_", k, "mgmL_Report.html", sep = ""),
+for (i in 1:length(experiments.file)) {
+  experimentName <- str_split(str_split(experiments.file[i], "Scripts/")[[1]][2], ".R")[[1]][1]
+  knit2html("./Scripts/Longevity_Report.Rmd", 
+            output = paste("./Results/", experimentName, "_Report.html", sep = ""),
             stylesheet = "./Scripts/foghorn_edited.css")
 }
 
-## To update just the reports for a specific experiment ##
-## set the j variable to the experiment number.         ##
-
-for (i in 1:length(food_conc)) {
-  j <- 3
-  k <- food_conc[i]
-  knit2html("./Scripts/Food_Optimization_Longevity_Report.Rmd", 
-            output = paste("./Results/p0", j, "_", k, "mgmL_Report.html", sep = ""),
-            stylesheet = "./Scripts/foghorn_edited.css")
-}
+# For testing one experiment ==============================
+experiments.file <- dir(path = "./Scripts", "mgmL", full.names = TRUE)
+experimentName <- str_split(str_split(experiments.file[1], "Scripts/")[[1]][2], ".R")[[1]][1]
+knit2html("./Scripts/Longevity_Report.Rmd", 
+          output = paste("./Results/", experimentName, "_Report.html", sep = ""),
+          stylesheet = "./Scripts/foghorn_edited.css")
