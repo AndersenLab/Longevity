@@ -11,7 +11,7 @@ output:
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
 alt <- substr(experimentName, start = 1, stop = nchar(experimentName) - 1)
-processedDataPath <- paste("../Data/Processed/", atl, sep = "")
+processedDataPath <- paste("../Data/Processed/", alt, sep = "")
 
 source("./wMT_fxns_alt.R")
 source("./survival_fxns.R")
@@ -43,7 +43,7 @@ inputList <- list()
 
 ## Need to change to using dplyr instead of plyr. ##
 for (i in 1:nFiles) {
-  output[[i]] <- processMicrotrackerReport(files[i])
+  inputList[[i]] <- processMicrotrackerReport(files[i])
   fileAttributes.df$binSize[i] = inputList[[i]]$binSize[1]
   fileAttributes.df$time[i] = inputList[[i]]$time[1]
   fileAttributes.df$numGroups[i] = inputList[[i]]$numGroups[1]
@@ -52,17 +52,17 @@ for (i in 1:nFiles) {
 
 experimentAttributes.df <- fileAttributes.df %>% summarise_each(funs(n_distinct))
 
-if (experimentAttributes$binSize != 1 || experimentAttributes$numGroups != 1) {
+if (experimentAttributes.df$binSize != 1 || experimentAttributes.df$numGroups != 1) {
   message("Not all wMicrotracker files have the same bin size or number of groups.")
 }
 
-minBins <- output[[1]]$numBins[1]
+minBins <- inputList[[1]]$numBins[1]
 
-for (i in 2:length(output)) {
-  minBins <- min(minBins, output[[i]]$numBins)
+for (i in 2:length(inputList)) {
+  minBins <- min(minBins, inputList[[i]]$numBins)
 }
 
-raw.df <- ldply(output, generateDataFrameFromFile) %>% filter(time <= minBins * 2) # need to check consistent binSize instead of 2
+raw.df <- ldply(inputList, generateDataFrameFromFile) %>% filter(time <= minBins * 2) # need to check consistent binSize instead of 2
 raw.df$day <- rep(1:(length(files)), each = nStrains * replicates * minBins)
 
 save(raw.df, file = paste(processedDataPath, "/", experimentName, "_Raw2.Rda", sep = ""), ascii = TRUE)
@@ -89,10 +89,10 @@ ggplot(ordered.df) + aes(x = day, y = activity) + geom_point() + facet_grid(row 
 ## Remove both columns and individual wells that were contaminated. ##
 
 cleaned.df <- ordered.df
-cleaned.df$activity[(ordered.df$col %in% colRemove)] <- NA
-for(i in 1:length(wellRemove$row)) {
-  cleaned.df$activity[cleaned.df$row == wellRemove$row[i] & cleaned.df$col == wellRemove$col[i]] <- NA
-  }
+#cleaned.df$activity[(ordered.df$col %in% colRemove)] <- NA
+#for(i in 1:length(wellRemove$row)) {
+  #cleaned.df$activity[cleaned.df$row == wellRemove$row[i] & cleaned.df$col == wellRemove$col[i]] <- NA
+#}
 
 save(cleaned.df, file = paste(processedDataPath, "/", experimentName, "_Cleaned2.Rda", sep = ""), ascii = TRUE)
 
