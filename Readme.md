@@ -12,6 +12,7 @@ wMicrotracker Scoring
 - [ ] Add normalizing to the number of worms per well
 - [ ] Add ability to specify number of worms per well that deviate from the ideal
 - [ ] CHANGE PARSING OF DATA FILES FROM PLYR TO DPLYR
+- [ ] Handle case where all activity for a group is 0, causes issue with nlm()
 
 
 
