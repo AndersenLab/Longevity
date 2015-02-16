@@ -11,8 +11,8 @@ output:
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
 alt <- substr(experimentName, start = 1, stop = nchar(experimentName) - 1)
+processedDataPath <- paste("../Data/Processed/", atl, sep = "")
 
-data.loc <- paste("../Data/Raw/", alt, sep = "")
 source("./wMT_fxns_alt.R")
 source("./survival_fxns.R")
 source(paste("./", experimentName, ".R", sep = ""))
@@ -23,36 +23,36 @@ paste(experimentName)
  
 ## Raw Activity ##
 
-```{r, warning = FALSE, message = FALSE, echo = FALSE}
+```{r, warning = FALSE, echo = FALSE}
 
 ## Pull in all the files associated with the current experiment  ##
 ## and create a data frame containing all the raw data.          ##
 ## Regroup data frame so that it's ordered by strain, replicate, ##
 ## and day. Add in strain information.                           ##
 
-files <- dir(path = data.loc, plateID, full.names = TRUE)
+files <- dir(path = paste("../Data/Raw/", alt, sep = ""), plateID, full.names = TRUE)
 
 nFiles <- length(files)
 
-test.df <- data.frame(binSize = vector(length = nFiles),
+fileAttributes.df <- data.frame(binSize = vector(length = nFiles),
                       time = vector(length = nFiles),
                       numGroups = vector(length = nFiles),
                       numBins = vector(length = nFiles))
 
-output <- list()
+inputList <- list()
 
 ## Need to change to using dplyr instead of plyr. ##
 for (i in 1:nFiles) {
   output[[i]] <- processMicrotrackerReport(files[i])
-  test.df$binSize[i] = output[[i]]$binSize[1]
-  test.df$time[i] = output[[i]]$time[1]
-  test.df$numGroups[i] = output[[i]]$numGroups[1]
-  test.df$numBins[i] = output[[i]]$numBins[1]
+  fileAttributes.df$binSize[i] = inputList[[i]]$binSize[1]
+  fileAttributes.df$time[i] = inputList[[i]]$time[1]
+  fileAttributes.df$numGroups[i] = inputList[[i]]$numGroups[1]
+  fileAttributes.df$numBins[i] = inputList[[i]]$numBins[1]
 }
 
-xhlhfds <- test.df %>% summarise_each(funs(n_distinct))
+experimentAttributes.df <- fileAttributes.df %>% summarise_each(funs(n_distinct))
 
-if (xhlhfds$binSize != 1 || xhlhfds$numGroups != 1) {
+if (experimentAttributes$binSize != 1 || experimentAttributes$numGroups != 1) {
   message("Not all wMicrotracker files have the same bin size or number of groups.")
 }
 
@@ -65,19 +65,19 @@ for (i in 2:length(output)) {
 raw.df <- ldply(output, generateDataFrameFromFile) %>% filter(time <= minBins * 2) # need to check consistent binSize instead of 2
 raw.df$day <- rep(1:(length(files)), each = nStrains * replicates * minBins)
 
-save(raw.df, file = paste(data.loc, "/", experimentName, "_Raw2.Rda", sep = ""), ascii = TRUE)
+save(raw.df, file = paste(processedDataPath, "/", experimentName, "_Raw2.Rda", sep = ""), ascii = TRUE)
 
-data.df <- raw.df[order(raw.df$col, raw.df$row, raw.df$day), ]
+ordered.df <- raw.df[order(raw.df$col, raw.df$row, raw.df$day), ]
 
-data.df$strain <- factor(data.df$col, labels = strains)
+ordered.df$strain <- factor(ordered.df$col, labels = strains)
 
-save(data.df, file = paste(data.loc, "/", experimentName, "_Processed2.Rda", sep = ""), ascii = TRUE)
+save(ordered.df, file = paste(processedDataPath, "/", experimentName, "_Processed2.Rda", sep = ""), ascii = TRUE)
 
 ```
 
-```{r Raw2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Raw2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(data.df) + aes(x = day, y = activity) + geom_point() + facet_grid(row ~ strain) +
+ggplot(ordered.df) + aes(x = day, y = activity) + geom_point() + facet_grid(row ~ strain) +
   labs(x = "Time (day)", y = "Raw Activity")
 
 ```
@@ -88,17 +88,17 @@ ggplot(data.df) + aes(x = day, y = activity) + geom_point() + facet_grid(row ~ s
 
 ## Remove both columns and individual wells that were contaminated. ##
 
-cleaned.df <- data.df
-cleaned.df$activity[(data.df$col %in% colRemove)] <- NA
+cleaned.df <- ordered.df
+cleaned.df$activity[(ordered.df$col %in% colRemove)] <- NA
 for(i in 1:length(wellRemove$row)) {
   cleaned.df$activity[cleaned.df$row == wellRemove$row[i] & cleaned.df$col == wellRemove$col[i]] <- NA
   }
 
-save(cleaned.df, file = paste(data.loc, "/", experimentName, "_Cleaned2.Rda", sep = ""), ascii = TRUE)
+save(cleaned.df, file = paste(processedDataPath, "/", experimentName, "_Cleaned2.Rda", sep = ""), ascii = TRUE)
 
 ```
 
-```{r Cleaned2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Cleaned2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(cleaned.df) + aes(x = factor(day), y = activity) + geom_boxplot() + facet_grid(row ~ strain) +
   labs(x= "Time (day)", y = "Raw Activity")
@@ -120,7 +120,7 @@ well.df <- ungroup(well.df)
 
 ## Well Mean Data ##
 
-```{r Well_Mean2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Well_Mean2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(well.df) + geom_line(aes(x = day, y = mean.activity)) + 
   geom_errorbar(aes(x = day, ymin = mean.activity - sd.activity, ymax = mean.activity + sd.activity)) + 
@@ -130,7 +130,7 @@ ggplot(well.df) + geom_line(aes(x = day, y = mean.activity)) +
 
 ## Well Median Data ##
 
-```{r Well_Median2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Well_Median2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(well.df) + aes(x = day, y = median.activity) + geom_line() + facet_grid(row ~ strain) +
   labs(x = "Time (day)", y = "Median Activity")
@@ -139,7 +139,7 @@ ggplot(well.df) + aes(x = day, y = median.activity) + geom_line() + facet_grid(r
 
 ## Well Total Data ##
 
-```{r Well_Total2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Well_Total2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(well.df) + aes(x = day, y = total.activity) + geom_line() + facet_grid(row ~ strain) +
   labs(x = "Time (day)", y = "Aggregate Activity")
@@ -159,11 +159,11 @@ well.df <- well.df %>%
 
 well.df <- ungroup(well.df)
 
-save(well.df, file = paste(data.loc, "/", experimentName, "_Well2.Rda", sep = ""), ascii = TRUE)
+save(well.df, file = paste(processedDataPath, "/", experimentName, "_Well2.Rda", sep = ""), ascii = TRUE)
 
 ```
 
-```{r Well_Normalized2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Well_Normalized2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(well.df) + aes(x = day, y = norm.act) + ylim(0, 100) + geom_line() + facet_grid(row ~ strain) +
   labs(x = "Time (day)", y = "Normalized Activity")
@@ -183,7 +183,7 @@ well.df <- ungroup(well.df)
   
 ```
 
-```{r Well_Adjusted2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Well_Adjusted2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(well.df) + aes(x = day, y = adjusted.activity) + geom_line() + facet_grid(row ~ strain) +
   labs(x = "Time (day)", y = "Adjusted Activity")
@@ -209,7 +209,7 @@ for (x in levels(well.df$strain)) {
     }
   }
 
-save(well_params.df, file = paste(data.loc, "/", experimentName, "_Well_Params2.Rda", sep = ""), ascii = TRUE)
+save(well_params.df, file = paste(processedDataPath, "/", experimentName, "_Well_Params2.Rda", sep = ""), ascii = TRUE)
 
 print(well_params.df)
 
@@ -247,7 +247,7 @@ for (i in 1:length(well.df$yvalue)) {
 
 ```
 
-```{r Well_Fits2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Well_Fits2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(well.df) + geom_line(aes(x = day, y = norm.act)) + ylim(0, 100) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(row ~ strain)
 
@@ -283,7 +283,7 @@ for (i in 1:length(strain.df$total.activity)) {
 
 ```
 
-```{r Strain_Mean2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Strain_Mean2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(strain.df) + geom_line(aes(x = day, y = mean.activity)) + 
   geom_errorbar(aes(x = day, ymin = mean.activity - sd.activity, ymax = mean.activity + sd.activity)) + 
@@ -293,7 +293,7 @@ ggplot(strain.df) + geom_line(aes(x = day, y = mean.activity)) +
 
 ## Strain Median Data ##
 
-```{r Strain_Median2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Strain_Median2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(strain.df) + aes(x = day, y = median.activity) + geom_line() + facet_wrap( ~ strain) +
   labs(x = "Time (day)", y = "Median Activity")
@@ -302,7 +302,7 @@ ggplot(strain.df) + aes(x = day, y = median.activity) + geom_line() + facet_wrap
 
 ## Strain Total Data ##
 
-```{r Strain_Total2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Strain_Total2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(strain.df) + aes(x = day, y = total.activity) + geom_line() + facet_wrap( ~ strain) +
   labs(x = "Time (day)", y = "Activity")
@@ -321,7 +321,7 @@ strain.df <- ungroup(strain.df)
 
 ```
 
-```{r Strain_Normalized2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Strain_Normalized2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(strain.df) + aes(x = day, y = norm.act) + ylim(0, 100) + geom_line() + facet_wrap( ~ strain) + 
   labs(x = "Time (day)", y = "Normalized Activity")
@@ -346,7 +346,7 @@ for (i in 1:length(strain.df$strain)) {
 
 ```
 
-```{r Strain_Adjusted2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Strain_Adjusted2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 #ggplot(strain.df) + aes(x = day, y = adjusted.activity) + geom_line() + facet_grid(row ~ strain) +
 #  labs(x = "Time (day)", y = "Adjusted Activity")
@@ -370,7 +370,7 @@ for (x in strains) {
   l = l + 1
 }
 
-save(strain_params.df, file = paste(data.loc, "/", experimentName, "_Strain_Params2.Rda", sep = ""), ascii = TRUE)
+save(strain_params.df, file = paste(processedDataPath, "/", experimentName, "_Strain_Params2.Rda", sep = ""), ascii = TRUE)
 
 print(strain_params.df)
 
@@ -403,7 +403,7 @@ for (i in 1:length(strain.df$yvalue)) {
 
 ```
 
-```{r Strain_Fits2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", data.loc, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Strain_Fits2, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste("Scripts/", processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(strain.df) + geom_line(aes(x = day, y = norm.act)) + ylim(0, 100) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ strain)
 
