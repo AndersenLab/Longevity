@@ -1,8 +1,5 @@
 library(knitr)
 
-## NOTE!! THIS IS CURRENTLY BROKEN DUE TO CHANGES TO MAKE ##
-## Loop_Reports_Alt.R WORK!!!                             ##
-
 trials <- 1:3
 food_conc <- 2:4
 

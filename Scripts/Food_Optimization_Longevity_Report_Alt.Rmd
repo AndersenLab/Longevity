@@ -89,10 +89,10 @@ ggplot(ordered.df) + aes(x = day, y = activity) + geom_point() + facet_grid(row 
 ## Remove both columns and individual wells that were contaminated. ##
 
 cleaned.df <- ordered.df
-#cleaned.df$activity[(ordered.df$col %in% colRemove)] <- NA
-#for(i in 1:length(wellRemove$row)) {
-  #cleaned.df$activity[cleaned.df$row == wellRemove$row[i] & cleaned.df$col == wellRemove$col[i]] <- NA
-#}
+cleaned.df$activity[(ordered.df$col %in% colRemove)] <- NA
+for(i in 1:length(wellRemove$row)) {
+  cleaned.df$activity[cleaned.df$row == wellRemove$row[i] & cleaned.df$col == wellRemove$col[i]] <- NA
+}
 
 save(cleaned.df, file = paste(processedDataPath, "/", experimentName, "_Cleaned2.Rda", sep = ""), ascii = TRUE)
 
