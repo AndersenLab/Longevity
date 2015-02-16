@@ -10,11 +10,6 @@ output:
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
-library("plyr")
-library("dplyr")
-library("ggplot2")
-library("tidyr")
-
 alt <- substr(experimentName, start = 1, stop = nchar(experimentName) - 1)
 
 data.loc <- paste("../Data/Raw/", alt, sep = "")
@@ -58,7 +53,7 @@ for (i in 1:nFiles) {
 xhlhfds <- test.df %>% summarise_each(funs(n_distinct))
 
 if (xhlhfds$binSize != 1 || xhlhfds$numGroups != 1) {
-  stop("Not all wMicrotracker files have the same bin size or number of groups.")
+  message("Not all wMicrotracker files have the same bin size or number of groups.")
 }
 
 minBins <- output[[1]]$numBins[1]

@@ -34,7 +34,7 @@ generateDataFrameFromFile <- function(experimentConditions) {
                      col = rep(rep(1:12, each = 8), experimentConditions$numBins[1]),
                      time = rep(seq(from = experimentConditions$binSize[1],
                                     to = experimentConditions$time[1],
-                                    step = experimentConditions$binSize[1]), each = experimentConditions$numGroups[1]),
+                                    by = experimentConditions$binSize[1]), each = experimentConditions$numGroups[1]),
                      activity = experimentConditions$num)
   return(full)
 }
