@@ -357,104 +357,591 @@ sup {
 
 <h2>Well Curve Fitting</h2>
 
-<pre><code>##     strain row      bparam       cparam
-## 1   CB4856   A  0.00000000     0.000000
-## 2   CB4856   B  0.00000000     0.000000
-## 3   CB4856   C  0.00000000     0.000000
-## 4   CB4856   D  0.00000000     0.000000
-## 5   CB4856   E  0.00000000     0.000000
-## 6   CB4856   F  0.00000000     0.000000
-## 7   CB4856   G  0.00000000     0.000000
-## 8   CB4856   H  0.00000000     0.000000
-## 9  CX11314   A  0.00000000     0.000000
-## 10 CX11314   B  0.00000000     0.000000
-## 11 CX11314   C  0.00000000     0.000000
-## 12 CX11314   D  0.00000000     0.000000
-## 13 CX11314   E  0.00000000     0.000000
-## 14 CX11314   F  0.00000000     0.000000
-## 15 CX11314   G  0.00000000     0.000000
-## 16 CX11314   H  0.00000000     0.000000
-## 17  ED3017   A  0.74075290    12.602526
-## 18  ED3017   B  0.59322805     5.537247
-## 19  ED3017   C  1.22399074     5.407521
-## 20  ED3017   D  0.22473533    87.993860
-## 21  ED3017   E  0.13184189  2465.589583
-## 22  ED3017   F  0.71015916     6.580486
-## 23  ED3017   G  0.51040808    91.215896
-## 24  ED3017   H  1.41823616     4.871322
-## 25 JT11398   A  0.00000000     0.000000
-## 26 JT11398   B  0.00000000     0.000000
-## 27 JT11398   C  0.00000000     0.000000
-## 28 JT11398   D  0.00000000     0.000000
-## 29 JT11398   E  0.00000000     0.000000
-## 30 JT11398   F  0.00000000     0.000000
-## 31 JT11398   G  0.00000000     0.000000
-## 32 JT11398   H  0.00000000     0.000000
-## 33   DL238   A  0.21937918  7042.919976
-## 34   DL238   B  0.16071891   665.660736
-## 35   DL238   C  0.93302609     5.582987
-## 36   DL238   D  0.27966730   108.190676
-## 37   DL238   E  0.08074094 19353.425922
-## 38   DL238   F  0.68703912    11.168358
-## 39   DL238   G -0.80577594     1.662386
-## 40   DL238   H  0.29905654    89.779951
-## 41      N2   A  0.00000000     0.000000
-## 42      N2   B  0.00000000     0.000000
-## 43      N2   C  0.00000000     0.000000
-## 44      N2   D  0.00000000     0.000000
-## 45      N2   E  0.00000000     0.000000
-## 46      N2   F  0.00000000     0.000000
-## 47      N2   G  0.00000000     0.000000
-## 48      N2   H  0.00000000     0.000000
-## 49    MY23   A  0.00000000     0.000000
-## 50    MY23   B  0.00000000     0.000000
-## 51    MY23   C  0.00000000     0.000000
-## 52    MY23   D  0.00000000     0.000000
-## 53    MY23   E  0.00000000     0.000000
-## 54    MY23   F  0.00000000     0.000000
-## 55    MY23   G  0.00000000     0.000000
-## 56    MY23   H  0.00000000     0.000000
-## 57   JU258   A  0.10074572 17586.992223
-## 58   JU258   B  0.04831452 17035.280049
-## 59   JU258   C -0.27940733     2.897032
-## 60   JU258   D  0.13369583 19572.313641
-## 61   JU258   E  0.14464039 17185.164686
-## 62   JU258   F  0.15291099 19511.588900
-## 63   JU258   G  0.14042994 19418.203020
-## 64   JU258   H  0.09882012 21324.111005
-## 65  EG4725   A  0.05787613 21087.001622
-## 66  EG4725   B  0.44313478    12.069347
-## 67  EG4725   C  1.57850847     6.191049
-## 68  EG4725   D  0.71871995    14.162313
-## 69  EG4725   E  0.10614307 19542.719026
-## 70  EG4725   F  0.55277502    81.828977
-## 71  EG4725   G  0.48572624    43.170097
-## 72  EG4725   H  0.11903290 18461.325742
-## 73   LKC34   A  0.22327170    15.655973
-## 74   LKC34   B  0.63813056     7.199802
-## 75   LKC34   C  1.08876574     6.692910
-## 76   LKC34   D  1.43941421     5.393663
-## 77   LKC34   E  3.26970370     5.701144
-## 78   LKC34   F  0.85099614     9.154878
-## 79   LKC34   G  0.10771718 20570.844562
-## 80   LKC34   H  0.21142476    17.317132
-## 81   JU775   A  1.67066008     8.184636
-## 82   JU775   B  0.91625887    13.946379
-## 83   JU775   C  1.01761027     7.602353
-## 84   JU775   D  0.36509679   105.858987
-## 85   JU775   E  1.77376255     7.929615
-## 86   JU775   F  1.07589861    13.161196
-## 87   JU775   G  0.69510608     9.096639
-## 88   JU775   H  0.13409940 20797.329148
-## 89    MY16   A  0.00000000     0.000000
-## 90    MY16   B  0.00000000     0.000000
-## 91    MY16   C  0.00000000     0.000000
-## 92    MY16   D  0.00000000     0.000000
-## 93    MY16   E  0.00000000     0.000000
-## 94    MY16   F  0.00000000     0.000000
-## 95    MY16   G  0.00000000     0.000000
-## 96    MY16   H  0.00000000     0.000000
-</code></pre>
+<table><thead>
+<tr>
+<th align="left">strain</th>
+<th align="left">row</th>
+<th align="right">bparam</th>
+<th align="right">cparam</th>
+</tr>
+</thead><tbody>
+<tr>
+<td align="left">CB4856</td>
+<td align="left">A</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">CB4856</td>
+<td align="left">B</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">CB4856</td>
+<td align="left">C</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">CB4856</td>
+<td align="left">D</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">CB4856</td>
+<td align="left">E</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">CB4856</td>
+<td align="left">F</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">CB4856</td>
+<td align="left">G</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">CB4856</td>
+<td align="left">H</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="left">A</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="left">B</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="left">C</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="left">D</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="left">E</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="left">F</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="left">G</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="left">H</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="left">A</td>
+<td align="right">0.7407529</td>
+<td align="right">12.602526</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="left">B</td>
+<td align="right">0.5932280</td>
+<td align="right">5.537247</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="left">C</td>
+<td align="right">1.2239907</td>
+<td align="right">5.407521</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="left">D</td>
+<td align="right">0.2247353</td>
+<td align="right">87.993860</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="left">E</td>
+<td align="right">0.1318419</td>
+<td align="right">2465.589583</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="left">F</td>
+<td align="right">0.7101592</td>
+<td align="right">6.580486</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="left">G</td>
+<td align="right">0.5104081</td>
+<td align="right">91.215896</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="left">H</td>
+<td align="right">1.4182362</td>
+<td align="right">4.871322</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="left">A</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="left">B</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="left">C</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="left">D</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="left">E</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="left">F</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="left">G</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="left">H</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="left">A</td>
+<td align="right">0.2193792</td>
+<td align="right">7042.919976</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="left">B</td>
+<td align="right">0.1607189</td>
+<td align="right">665.660736</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="left">C</td>
+<td align="right">0.9330261</td>
+<td align="right">5.582987</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="left">D</td>
+<td align="right">0.2796673</td>
+<td align="right">108.190676</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="left">E</td>
+<td align="right">0.0807409</td>
+<td align="right">19353.425922</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="left">F</td>
+<td align="right">0.6870391</td>
+<td align="right">11.168358</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="left">G</td>
+<td align="right">-0.8057759</td>
+<td align="right">1.662386</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="left">H</td>
+<td align="right">0.2990565</td>
+<td align="right">89.779951</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">A</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">B</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">C</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">D</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">E</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">F</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">G</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">H</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="left">A</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="left">B</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="left">C</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="left">D</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="left">E</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="left">F</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="left">G</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="left">H</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="left">A</td>
+<td align="right">0.1007457</td>
+<td align="right">17586.992223</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="left">B</td>
+<td align="right">0.0483145</td>
+<td align="right">17035.280049</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="left">C</td>
+<td align="right">-0.2794073</td>
+<td align="right">2.897032</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="left">D</td>
+<td align="right">0.1336958</td>
+<td align="right">19572.313641</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="left">E</td>
+<td align="right">0.1446404</td>
+<td align="right">17185.164686</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="left">F</td>
+<td align="right">0.1529110</td>
+<td align="right">19511.588900</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="left">G</td>
+<td align="right">0.1404299</td>
+<td align="right">19418.203020</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="left">H</td>
+<td align="right">0.0988201</td>
+<td align="right">21324.111005</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="left">A</td>
+<td align="right">0.0578761</td>
+<td align="right">21087.001622</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="left">B</td>
+<td align="right">0.4431348</td>
+<td align="right">12.069347</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="left">C</td>
+<td align="right">1.5785085</td>
+<td align="right">6.191050</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="left">D</td>
+<td align="right">0.7187199</td>
+<td align="right">14.162313</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="left">E</td>
+<td align="right">0.1061431</td>
+<td align="right">19542.719026</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="left">F</td>
+<td align="right">0.5527750</td>
+<td align="right">81.828977</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="left">G</td>
+<td align="right">0.4857262</td>
+<td align="right">43.170097</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="left">H</td>
+<td align="right">0.1190329</td>
+<td align="right">18461.325742</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="left">A</td>
+<td align="right">0.2232717</td>
+<td align="right">15.655973</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="left">B</td>
+<td align="right">0.6381306</td>
+<td align="right">7.199802</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="left">C</td>
+<td align="right">1.0887657</td>
+<td align="right">6.692909</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="left">D</td>
+<td align="right">1.4394142</td>
+<td align="right">5.393663</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="left">E</td>
+<td align="right">3.2697037</td>
+<td align="right">5.701144</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="left">F</td>
+<td align="right">0.8509961</td>
+<td align="right">9.154878</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="left">G</td>
+<td align="right">0.1077172</td>
+<td align="right">20570.844562</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="left">H</td>
+<td align="right">0.2114248</td>
+<td align="right">17.317132</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="left">A</td>
+<td align="right">1.6706601</td>
+<td align="right">8.184636</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="left">B</td>
+<td align="right">0.9162589</td>
+<td align="right">13.946379</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="left">C</td>
+<td align="right">1.0176103</td>
+<td align="right">7.602353</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="left">D</td>
+<td align="right">0.3650968</td>
+<td align="right">105.858987</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="left">E</td>
+<td align="right">1.7737626</td>
+<td align="right">7.929615</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="left">F</td>
+<td align="right">1.0758986</td>
+<td align="right">13.161196</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="left">G</td>
+<td align="right">0.6951061</td>
+<td align="right">9.096639</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="left">H</td>
+<td align="right">0.1340994</td>
+<td align="right">20797.329148</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="left">A</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="left">B</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="left">C</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="left">D</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="left">E</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="left">F</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="left">G</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="left">H</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+</tbody></table>
 
 <h2>2 Parameter Logistic Function Fits by Well</h2>
 
@@ -482,20 +969,74 @@ sup {
 
 <h2>Strain Curve Fitting</h2>
 
-<pre><code>##     strain    bparam      cparam
-## 1   CB4856 0.0000000    0.000000
-## 2  CX11314 0.0000000    0.000000
-## 3   ED3017 1.1018878    9.916044
-## 4  JT11398 0.0000000    0.000000
-## 5    DL238 0.2910677 4092.821341
-## 6       N2 0.0000000    0.000000
-## 7     MY23 0.0000000    0.000000
-## 8    JU258 5.5852789   20.826335
-## 9   EG4725 0.6331363   54.549031
-## 10   LKC34 1.0132770    9.488908
-## 11   JU775 0.8799710   13.099710
-## 12    MY16 0.0000000    0.000000
-</code></pre>
+<table><thead>
+<tr>
+<th align="left">strain</th>
+<th align="right">bparam</th>
+<th align="right">cparam</th>
+</tr>
+</thead><tbody>
+<tr>
+<td align="left">CB4856</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="right">1.1018878</td>
+<td align="right">9.916044</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="right">0.2910677</td>
+<td align="right">4092.821341</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="right">5.5852789</td>
+<td align="right">20.826335</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="right">0.6331363</td>
+<td align="right">54.549031</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="right">1.0132770</td>
+<td align="right">9.488908</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="right">0.8799710</td>
+<td align="right">13.099710</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+</tbody></table>
 
 <h2>2 Parameter Logistic Function Fits by Strain</h2>
 

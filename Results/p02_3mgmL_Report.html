@@ -361,104 +361,591 @@ sup {
 
 <h2>Well Curve Fitting</h2>
 
-<pre><code>##     strain row bparam cparam
-## 1   CB4856   A      0      0
-## 2   CB4856   B      0      0
-## 3   CB4856   C      0      0
-## 4   CB4856   D      0      0
-## 5   CB4856   E      0      0
-## 6   CB4856   F      0      0
-## 7   CB4856   G      0      0
-## 8   CB4856   H      0      0
-## 9  CX11314   A      0      0
-## 10 CX11314   B      0      0
-## 11 CX11314   C      0      0
-## 12 CX11314   D      0      0
-## 13 CX11314   E      0      0
-## 14 CX11314   F      0      0
-## 15 CX11314   G      0      0
-## 16 CX11314   H      0      0
-## 17  ED3017   A      0      0
-## 18  ED3017   B      0      0
-## 19  ED3017   C      0      0
-## 20  ED3017   D      0      0
-## 21  ED3017   E      0      0
-## 22  ED3017   F      0      0
-## 23  ED3017   G      0      0
-## 24  ED3017   H      0      0
-## 25 JT11398   A      0      0
-## 26 JT11398   B      0      0
-## 27 JT11398   C      0      0
-## 28 JT11398   D      0      0
-## 29 JT11398   E      0      0
-## 30 JT11398   F      0      0
-## 31 JT11398   G      0      0
-## 32 JT11398   H      0      0
-## 33   DL238   A      0      0
-## 34   DL238   B      0      0
-## 35   DL238   C      0      0
-## 36   DL238   D      0      0
-## 37   DL238   E      0      0
-## 38   DL238   F      0      0
-## 39   DL238   G      0      0
-## 40   DL238   H      0      0
-## 41      N2   A      0      0
-## 42      N2   B      0      0
-## 43      N2   C      0      0
-## 44      N2   D      0      0
-## 45      N2   E      0      0
-## 46      N2   F      0      0
-## 47      N2   G      0      0
-## 48      N2   H      0      0
-## 49    MY23   A      0      0
-## 50    MY23   B      0      0
-## 51    MY23   C      0      0
-## 52    MY23   D      0      0
-## 53    MY23   E      0      0
-## 54    MY23   F      0      0
-## 55    MY23   G      0      0
-## 56    MY23   H      0      0
-## 57   JU258   A      0      0
-## 58   JU258   B      0      0
-## 59   JU258   C      0      0
-## 60   JU258   D      0      0
-## 61   JU258   E      0      0
-## 62   JU258   F      0      0
-## 63   JU258   G      0      0
-## 64   JU258   H      0      0
-## 65  EG4725   A      0      0
-## 66  EG4725   B      0      0
-## 67  EG4725   C      0      0
-## 68  EG4725   D      0      0
-## 69  EG4725   E      0      0
-## 70  EG4725   F      0      0
-## 71  EG4725   G      0      0
-## 72  EG4725   H      0      0
-## 73   LKC34   A      0      0
-## 74   LKC34   B      0      0
-## 75   LKC34   C      0      0
-## 76   LKC34   D      0      0
-## 77   LKC34   E      0      0
-## 78   LKC34   F      0      0
-## 79   LKC34   G      0      0
-## 80   LKC34   H      0      0
-## 81   JU775   A      0      0
-## 82   JU775   B      0      0
-## 83   JU775   C      0      0
-## 84   JU775   D      0      0
-## 85   JU775   E      0      0
-## 86   JU775   F      0      0
-## 87   JU775   G      0      0
-## 88   JU775   H      0      0
-## 89    MY16   A      0      0
-## 90    MY16   B      0      0
-## 91    MY16   C      0      0
-## 92    MY16   D      0      0
-## 93    MY16   E      0      0
-## 94    MY16   F      0      0
-## 95    MY16   G      0      0
-## 96    MY16   H      0      0
-</code></pre>
+<table><thead>
+<tr>
+<th align="left">strain</th>
+<th align="left">row</th>
+<th align="right">bparam</th>
+<th align="right">cparam</th>
+</tr>
+</thead><tbody>
+<tr>
+<td align="left">CB4856</td>
+<td align="left">A</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">CB4856</td>
+<td align="left">B</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">CB4856</td>
+<td align="left">C</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">CB4856</td>
+<td align="left">D</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">CB4856</td>
+<td align="left">E</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">CB4856</td>
+<td align="left">F</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">CB4856</td>
+<td align="left">G</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">CB4856</td>
+<td align="left">H</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="left">A</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="left">B</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="left">C</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="left">D</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="left">E</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="left">F</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="left">G</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="left">H</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="left">A</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="left">B</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="left">C</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="left">D</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="left">E</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="left">F</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="left">G</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="left">H</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="left">A</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="left">B</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="left">C</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="left">D</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="left">E</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="left">F</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="left">G</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="left">H</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="left">A</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="left">B</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="left">C</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="left">D</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="left">E</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="left">F</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="left">G</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="left">H</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">A</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">B</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">C</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">D</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">E</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">F</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">G</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">H</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="left">A</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="left">B</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="left">C</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="left">D</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="left">E</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="left">F</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="left">G</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="left">H</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="left">A</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="left">B</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="left">C</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="left">D</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="left">E</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="left">F</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="left">G</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="left">H</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="left">A</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="left">B</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="left">C</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="left">D</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="left">E</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="left">F</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="left">G</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="left">H</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="left">A</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="left">B</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="left">C</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="left">D</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="left">E</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="left">F</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="left">G</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="left">H</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="left">A</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="left">B</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="left">C</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="left">D</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="left">E</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="left">F</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="left">G</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="left">H</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="left">A</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="left">B</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="left">C</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="left">D</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="left">E</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="left">F</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="left">G</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="left">H</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+</tbody></table>
 
 <h2>2 Parameter Logistic Function Fits by Well</h2>
 
@@ -490,20 +977,74 @@ sup {
 
 <h2>Strain Curve Fitting</h2>
 
-<pre><code>##     strain bparam cparam
-## 1   CB4856      0      0
-## 2  CX11314      0      0
-## 3   ED3017      0      0
-## 4  JT11398      0      0
-## 5    DL238      0      0
-## 6       N2      0      0
-## 7     MY23      0      0
-## 8    JU258      0      0
-## 9   EG4725      0      0
-## 10   LKC34      0      0
-## 11   JU775      0      0
-## 12    MY16      0      0
-</code></pre>
+<table><thead>
+<tr>
+<th align="left">strain</th>
+<th align="right">bparam</th>
+<th align="right">cparam</th>
+</tr>
+</thead><tbody>
+<tr>
+<td align="left">CB4856</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">CX11314</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">ED3017</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JT11398</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">DL238</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY23</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU258</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">EG4725</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">LKC34</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">JU775</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="left">MY16</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+</tbody></table>
 
 <h2>2 Parameter Logistic Function Fits by Strain</h2>
 

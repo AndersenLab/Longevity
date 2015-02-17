@@ -1,0 +1,20 @@
+unnamed-chunk-2	experimentAttributes.df	fileAttributes.df	files	i	inputList	minBins	nFiles	ordered.df	raw.df
+Raw	
+unnamed-chunk-3	cleaned.df	i
+Cleaned	
+unnamed-chunk-4	well.df
+Well_Mean	
+Well_Median	
+Well_Total	
+unnamed-chunk-5	well.df
+Well_Normalized	
+unnamed-chunk-6	well.df
+Well_Adjusted	
+unnamed-chunk-7	l	temp	well_params.df	x	y
+unnamed-chunk-8	draw_twoplog	i	l	times	well_survivals.df	well.df	x	y
+Well_Fits	
+unnamed-chunk-9	i	strain.df
+Strain_Mean	
+Strain_Median	
+Strain_Total	
+unnamed-chunk-10	strain.df
