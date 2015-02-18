@@ -12,10 +12,10 @@ output:
 ```
 ## [1] "p03_4mgmL"
 ```
- 
+
+
+
 ## Raw Activity ##
-
-
 
 ![plot of chunk Raw](Scripts/../Data/Processed/p03_4mgmL/p03_4mgmL_Raw-1.png) 
 
