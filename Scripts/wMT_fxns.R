@@ -29,7 +29,7 @@ processMicrotrackerReport <- function(file) {
 # Generates the data frame that will be used in the RMarkdown document ###################################
 
 generateDataFrameFromFile <- function(experimentConditions) {
-  full <- data.frame(row = rep(rep(c("A", "B", "C", "D", "E", "F", "G", "H"), 12), experimentConditions$numBins[1]),
+  full <- data.frame(row = rep(rep(rows, 12), experimentConditions$numBins[1]),
                      col = rep(rep(1:12, each = 8), experimentConditions$numBins[1]),
                      time = rep(seq(from = experimentConditions$binSize[1],
                                     to = experimentConditions$time[1],

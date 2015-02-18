@@ -1,20 +1,27 @@
-unnamed-chunk-2	!=	[[	[[<-	[<-	%>%	<=	||	$	$<-	data.frame	dir	experimentName	factor	filter	for	funs	generateDataFrameFromFile	if	ldply	length	list	message	min	n_distinct	nStrains	order	paste	processedDataPath	processMicrotrackerReport	rep	replicates	save	strains	summarise_each	time	vector
+unnamed-chunk-2	[<-	&	==	$	$<-	colRemove	experimentName	for	nrow	ordered.df	paste	processedDataPath	save	wellRemove
 Raw	~	activity	aes	day	facet_grid	geom_point	ggplot	labs	ordered.df	presentation
-unnamed-chunk-3	[<-	&	==	$	$<-	colRemove	experimentName	for	nrow	ordered.df	paste	processedDataPath	save	wellRemove
+unnamed-chunk-3	%>%	activity	cleaned.df	day	group_by	mean	median	row	sd	strain	sum	summarize	ungroup
 Cleaned	~	activity	aes	cleaned.df	day	facet_grid	factor	geom_boxplot	ggplot	labs	presentation
-unnamed-chunk-4	%>%	activity	cleaned.df	day	group_by	mean	median	row	sd	strain	sum	summarize	ungroup
+unnamed-chunk-4	%>%	experimentName	group_by	max	mutate	paste	processedDataPath	row	save	strain	total.activity	ungroup
 Well_Mean	~	aes	day	facet_grid	geom_errorbar	geom_line	ggplot	labs	mean.activity	presentation	sd.activity	well.df
 Well_Median	~	aes	day	facet_grid	geom_line	ggplot	labs	median.activity	presentation	well.df
 Well_Total	~	aes	day	facet_grid	geom_line	ggplot	labs	presentation	total.activity	well.df
-unnamed-chunk-5	%>%	experimentName	group_by	max	mutate	paste	processedDataPath	row	save	strain	total.activity	ungroup
+unnamed-chunk-5	%>%	<	day	group_by	ifelse	max.sum	mutate	norm.act	row	strain	ungroup	which.max
 Well_Normalized	~	aes	day	facet_grid	geom_line	ggplot	labs	norm.act	presentation	well.df	ylim
-unnamed-chunk-6	%>%	<	day	group_by	ifelse	max.sum	mutate	norm.act	row	strain	ungroup	which.max
+unnamed-chunk-6	!	[[	[<-	&	==	$	$<-	c	data.frame	experimentName	for	if	is.na	kable	length	levels	nlm	nStrains	paste	processedDataPath	rep	replicates	rows	save	strains	well_twoplog	well.df
 Well_Adjusted	~	adjusted.activity	aes	day	facet_grid	geom_line	ggplot	labs	presentation	well.df
-unnamed-chunk-7	!	[[	[<-	&	==	$	$<-	c	data.frame	experimentName	for	if	is.na	kable	length	levels	nlm	nStrains	paste	processedDataPath	rep	replicates	save	strains	well_twoplog	well.df
-unnamed-chunk-8	[<-	&	%>%	^	==	$	$<-	data.frame	for	gather	if	is.na	levels	nrow	return	strain	strains	unique	well_params.df	yvalue
+unnamed-chunk-7	[<-	&	%>%	^	==	$	$<-	data.frame	for	gather	if	is.na	nrow	return	rows	strain	strains	unique	well_params.df	yvalue
+unnamed-chunk-8	!	[<-	%>%	==	$	$<-	day	for	group_by	if	is.finite	mean	median	nrow	sd	strain	sum	summarise	total.activity	ungroup	well.df
 Well_Fits	~	aes	day	facet_grid	geom_line	ggplot	norm.act	presentation	well.df	ylim	yvalue
-unnamed-chunk-9	!	[<-	%>%	==	$	$<-	day	for	group_by	if	is.finite	mean	median	nrow	sd	strain	sum	summarise	total.activity	ungroup	well.df
+unnamed-chunk-9	%>%	group_by	max	mutate	strain	total.activity	ungroup
 Strain_Mean	~	aes	day	facet_wrap	geom_errorbar	geom_line	ggplot	labs	mean.activity	presentation	sd.activity	strain.df
 Strain_Median	~	aes	day	facet_wrap	geom_line	ggplot	labs	median.activity	presentation	strain.df
 Strain_Total	~	aes	day	facet_wrap	geom_line	ggplot	labs	presentation	strain.df	total.activity
-unnamed-chunk-10	%>%	group_by	max	mutate	strain	total.activity	ungroup
+unnamed-chunk-10	[<-	%>%	<	$	$<-	day	for	group_by	ifelse	length	mutate	norm.act	nrow	rep	strain	ungroup	which.max
+Strain_Normalized	~	aes	day	facet_wrap	geom_line	ggplot	labs	norm.act	presentation	strain.df	ylim
+unnamed-chunk-11	!	[[	[<-	==	$	$<-	c	data.frame	experimentName	for	if	is.na	kable	nlm	nStrains	paste	processedDataPath	rep	save	strain_twoplog	strain.df	strains
+Strain_Adjusted	~	adjusted.activity	aes	day	facet_wrap	geom_line	ggplot	labs	presentation	strain.df
+unnamed-chunk-12	[<-	%>%	==	$	$<-	data.frame	draw_twoplog	for	gather	if	is.na	nrow	strain	strain_params.df	strains	unique	yvalue
+unnamed-chunk-13	[<-	%>%	==	$	$<-	data.frame	draw_twoplog	for	gather	if	is.na	nrow	strain	strain_params.df	strains	unique	yvalue
+Strain_Fits	~	aes	day	facet_wrap	geom_line	ggplot	norm.act	presentation	strain.df	ylim	yvalue
+unnamed-chunk-1	!=	[[	[[<-	[<-	%>%	<=	||	$	$<-	data.frame	dir	experimentName	factor	filter	for	funs	generateDataFrameFromFile	if	ldply	length	list	message	min	n_distinct	nStrains	order	paste	processedDataPath	processMicrotrackerReport	rep	replicates	save	strains	summarise_each	time	vector

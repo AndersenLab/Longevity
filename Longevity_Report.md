@@ -17,39 +17,39 @@ output:
 
 ## Raw Activity ##
 
-![plot of chunk Raw](Scripts/../Data/Processed/p03_4mgmL/p03_4mgmL_Raw-1.png) 
+![plot of chunk Raw](Data/Processed/p03_4mgmL/p03_4mgmL_Raw-1.png) 
 
 ## Cleaned Data ##
 
 
 
-![plot of chunk Cleaned](Scripts/../Data/Processed/p03_4mgmL/p03_4mgmL_Cleaned-1.png) 
+![plot of chunk Cleaned](Data/Processed/p03_4mgmL/p03_4mgmL_Cleaned-1.png) 
 
 
 
 ## Well Mean Data ##
 
-![plot of chunk Well_Mean](Scripts/../Data/Processed/p03_4mgmL/p03_4mgmL_Well_Mean-1.png) 
+![plot of chunk Well_Mean](Data/Processed/p03_4mgmL/p03_4mgmL_Well_Mean-1.png) 
 
 ## Well Median Data ##
 
-![plot of chunk Well_Median](Scripts/../Data/Processed/p03_4mgmL/p03_4mgmL_Well_Median-1.png) 
+![plot of chunk Well_Median](Data/Processed/p03_4mgmL/p03_4mgmL_Well_Median-1.png) 
 
 ## Well Total Data ##
 
-![plot of chunk Well_Total](Scripts/../Data/Processed/p03_4mgmL/p03_4mgmL_Well_Total-1.png) 
+![plot of chunk Well_Total](Data/Processed/p03_4mgmL/p03_4mgmL_Well_Total-1.png) 
 
 ## Well Normalized Data ##
 
 
 
-![plot of chunk Well_Normalized](Scripts/../Data/Processed/p03_4mgmL/p03_4mgmL_Well_Normalized-1.png) 
+![plot of chunk Well_Normalized](Data/Processed/p03_4mgmL/p03_4mgmL_Well_Normalized-1.png) 
 
 ## Setting Top of Curve by Well ##
 
 
 
-![plot of chunk Well_Adjusted](Scripts/../Data/Processed/p03_4mgmL/p03_4mgmL_Well_Adjusted-1.png) 
+![plot of chunk Well_Adjusted](Data/Processed/p03_4mgmL/p03_4mgmL_Well_Adjusted-1.png) 
 
 ## Well Curve Fitting ##
 
@@ -157,33 +157,36 @@ output:
 
 
 
-![plot of chunk Well_Fits](Scripts/../Data/Processed/p03_4mgmL/p03_4mgmL_Well_Fits-1.png) 
+
+```
+## Error in ggplot(well.df): object 'well.df' not found
+```
 
 ## Strain Mean Data ##
 
 
 
-![plot of chunk Strain_Mean](Scripts/../Data/Processed/p03_4mgmL/p03_4mgmL_Strain_Mean-1.png) 
+![plot of chunk Strain_Mean](Data/Processed/p03_4mgmL/p03_4mgmL_Strain_Mean-1.png) 
 
 ## Strain Median Data ##
 
-![plot of chunk Strain_Median](Scripts/../Data/Processed/p03_4mgmL/p03_4mgmL_Strain_Median-1.png) 
+![plot of chunk Strain_Median](Data/Processed/p03_4mgmL/p03_4mgmL_Strain_Median-1.png) 
 
 ## Strain Total Data ##
 
-![plot of chunk Strain_Total](Scripts/../Data/Processed/p03_4mgmL/p03_4mgmL_Strain_Total-1.png) 
+![plot of chunk Strain_Total](Data/Processed/p03_4mgmL/p03_4mgmL_Strain_Total-1.png) 
 
 ## Strain Normalized Data ##
 
 
 
-![plot of chunk Strain_Normalized](Scripts/../Data/Processed/p03_4mgmL/p03_4mgmL_Strain_Normalized-1.png) 
+![plot of chunk Strain_Normalized](Data/Processed/p03_4mgmL/p03_4mgmL_Strain_Normalized-1.png) 
 
 ## Setting Top of Curve by Strain ##
 
 
 
-![plot of chunk Strain_Adjusted](Scripts/../Data/Processed/p03_4mgmL/p03_4mgmL_Strain_Adjusted-1.png) 
+![plot of chunk Strain_Adjusted](Data/Processed/p03_4mgmL/p03_4mgmL_Strain_Adjusted-1.png) 
 
 ## Strain Curve Fitting ##
 
@@ -207,4 +210,4 @@ output:
 
 
 
-![plot of chunk Strain_Fits](Scripts/../Data/Processed/p03_4mgmL/p03_4mgmL_Strain_Fits-1.png) 
+![plot of chunk Strain_Fits](Data/Processed/p03_4mgmL/p03_4mgmL_Strain_Fits-1.png) 
