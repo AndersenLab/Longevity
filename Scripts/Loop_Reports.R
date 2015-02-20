@@ -13,7 +13,7 @@ library("dplyr")
 library("ggplot2")
 library("tidyr")
 
-experiments.file <- dir(path = "./Scripts", "mgmL", full.names = TRUE)
+experiments.file <- dir(path = "./Scripts", "p0", full.names = TRUE)
 opts_knit$set(root.dir = getwd())
 
 for (i in 1:length(experiments.file)) {
@@ -26,7 +26,7 @@ for (i in 1:length(experiments.file)) {
 
 ## For testing one experiment ####################################################################
 
-experiments.file <- dir(path = "./Scripts", "mgmL", full.names = TRUE)
+experiments.file <- dir(path = "./Scripts", "p0", full.names = TRUE)
 experimentName <- str_split(str_split(experiments.file[9], "Scripts/")[[1]][2], ".R")[[1]][1]
 opts_knit$set(cache.path = paste("./Data/Processed/", experimentName, "/cache/", sep = ""))
 knit2html("./Scripts/Longevity_Report.Rmd", 
