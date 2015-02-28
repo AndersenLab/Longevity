@@ -14,8 +14,8 @@ strain_weibull <- function(input, df, strain) {
   sum(((100 * 100 ^ (-((df$day[df$strain == strain] / input[2]) ^ input[1]))) - df$norm.act[df$strain == strain]) ^ 2)
 }
 
-well_twoplog <- function(input, df, row, strain) {
-  sum(((100 / (1 + ((df$day[df$row == row & df$strain == strain] / input[2]) ^ input[1]))) - df$norm.act[df$row == row & df$strain == strain]) ^ 2)
+well_twoplog <- function(input, df, row, col) {
+  sum(((100 / (1 + ((df$day[df$row == row & df$col == col] / input[2]) ^ input[1]))) - df$norm.act[df$row == row & df$col == col]) ^ 2)
 }
 
 strain_twoplog <- function(input, df, strain) {
