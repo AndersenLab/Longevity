@@ -13,7 +13,7 @@ library("dplyr")
 library("ggplot2")
 library("tidyr")
 
-experiments.file <- dir(path = "./Scripts", "p04", full.names = TRUE)
+experiments.file <- dir(path = "./Scripts", "p03", full.names = TRUE)
 opts_knit$set(root.dir = getwd())
 
 for (i in 1:length(experiments.file)) {
