@@ -77,7 +77,7 @@ for (i in 2:length(inputList)) {
 
 raw.df <- ldply(inputList, generateDataFrameFromFile) %>% 
   filter(time <= minBins * fileAttributes.df$binSize[1])
-raw.df$day <- rep(1:nFiles, each = nStrains * replicates * minBins)
+raw.df$day <- rep(pullDateInformation(files), each = nStrains * replicates * minBins)
 
 save(raw.df, file = paste(processedDataPath, "/", experimentName, "_Raw.Rda", sep = ""), ascii = TRUE)
 

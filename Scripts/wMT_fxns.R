@@ -37,3 +37,17 @@ generateDataFrameFromFile <- function(experimentConditions) {
                      activity = experimentConditions$num)
   return(full)
 }
+
+# Pulls the dates from file names and returns a numeric vector corresponding to the time from worm sorting.
+
+pullDateInformation <- function(fileList) {
+  days <- vector(length = length(fileList))
+  for (i in 1:length(fileList)) {
+    year <- substr(str_split(str_split(fileList[i], "/")[[1]][5], "_")[[1]][1], 1, 4)
+    month <- substr(str_split(str_split(fileList[i], "/")[[1]][5], "_")[[1]][1], 5, 6)
+    day <- substr(str_split(str_split(fileList[i], "/")[[1]][5], "_")[[1]][1], 7, 8)
+    date <- as.Date(paste(year, "-", month, "-", day, sep = ""))
+    days[i] = date
+  }
+  return(days - days[1] + 1)
+}
