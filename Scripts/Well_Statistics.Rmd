@@ -1,0 +1,74 @@
+---
+title: "Well_Statistics"
+author: "Ryan Abdella"
+date: "3 March 2015"
+output: html_document
+---
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+source("./Scripts/survival_fxns.R")
+source(paste("./Scripts/", experimentName, ".R", sep = ""))
+processedDataPath <- paste("./Data/Processed/", experimentName, sep = "")
+saveDataLocation <- paste(processedDataPath, "/", experimentName, sep = "")
+
+load(paste("./Data/Processed/", experimentName, "/", experimentName, "_Well.Rda", sep = ""))
+
+```
+
+## Well Curve Fitting ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE, results = "asis"}
+
+well_params.df <- data.frame(col = rep(1:12, each = length(rows)), row = rep(rows, nStrains), bparam = rep(0, nStrains * replicates), cparam = rep(0, nStrains * replicates))
+
+l = 1
+
+for (x in 1:12) {
+  for (y in rows) {
+    if (!(is.na(well.df$norm.activity[well.df$row == y & well.df$col == x]))[1] == TRUE) {
+      temp <- nlm(well_twoplog, c(2, 1), well.df, y, x)[["estimate"]]
+      well_params.df$bparam[l] <- temp[1]
+      well_params.df$cparam[l] <- temp[2]
+    }
+    l = l + 1
+  }
+}
+
+save(well_params.df, file = paste(processedDataPath, "/", experimentName, "_Well_Params.Rda", sep = ""), ascii = TRUE)
+
+kable(well_params.df)
+
+```
+
+## 2 Parameter Logistic Function Fits by Well ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+times <- unique(well.df$day)
+
+draw_twoplog <- function(bparam, cparam) {
+  return((100 / (1 + ((times / cparam) ^ bparam))))
+}
+
+well_survivals.df <- data.frame(day = times)
+
+l <- 2
+
+for (x in 1:12) {
+  for (y in rows) {
+    well_survivals.df[l] <- draw_twoplog(well_params.df$bparam[well_params.df$col == x & well_params.df$row == y], well_params.df$cparam[well_params.df$col == x & well_params.df$row == y])
+    l <- l + 1
+  }
+}
+
+well_survivals.df <- well_survivals.df %>% gather(strain, yvalue, 2:97)
+well.df$yvalue <- well_survivals.df$yvalue
+
+for (i in 1:nrow(well.df)) {
+  if (is.na(well.df$norm.activity[i]) == TRUE) {
+    well.df$yvalue[i] <- NA
+  }
+}
+
+```

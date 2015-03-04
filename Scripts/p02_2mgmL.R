@@ -7,3 +7,5 @@ rows <- c("A", "B", "C", "D", "E", "F", "G", "H")
 nStrains <- length(strains)
 colRemove <- c(1, 2, 4, 6, 7, 12)
 wellRemove <- data.frame(col = c(), row = c())
+
+nums <- rep(10, 96)

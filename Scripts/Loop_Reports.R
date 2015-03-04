@@ -25,7 +25,7 @@ for (i in 1:length(experiments.file)) {
 
 ## For testing one experiment ####################################################################
 
-experiments.file <- dir(path = "./Scripts", "p03", full.names = TRUE)
+experiments.file <- dir(path = "./Scripts", "p04", full.names = TRUE)
 opts_knit$set(root.dir = getwd())
 experimentName <- str_split(str_split(experiments.file[1], "Scripts/")[[1]][2], ".R")[[1]][1]
 knit2html("./Scripts/Longevity_Report.Rmd", 

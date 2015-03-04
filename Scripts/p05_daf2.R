@@ -8,3 +8,5 @@ nStrains <- length(strains)
 colRemove <- c()
 wellRemove <- data.frame(col = c(1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 5, 5, 5, 6, 8, 10, 11, 11, 11, 11, 11, 12, 12, 12),
                          row = c("A", "B", "G", "C", "B", "A", "B", "C", "D", "B", "A", "B", "E", "D", "D", "A", "C", "D", "F", "G", "H", "E", "D", "C"))
+
+nums <- scan("./Scripts/daf2_count.txt", sep = " ")

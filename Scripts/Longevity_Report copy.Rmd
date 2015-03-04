@@ -157,12 +157,31 @@ well.df$uniqueStrain <- rep(uniqueStrains, each = replicates * nFiles)
 
 ```
 
-## Well Data ##
+## Well Mean Data ##
 
-```{r Well, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Well_Mean, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(well.df) + aes(x = day, y = activity) + geom_line() + facet_grid(row ~ col, labeller = label_strains) +
-  labs(x = "Time (day)", y = "Activity") + presentation
+ggplot(well.df) + geom_line(aes(x = day, y = mean.activity)) + 
+  geom_errorbar(aes(x = day, ymin = mean.activity - sd.activity, ymax = mean.activity + sd.activity)) + 
+  facet_grid(row ~ col, labeller = label_strains) + labs(x = "Time (day)", y = "Mean Activity") + presentation
+
+```
+
+## Well Median Data ##
+
+```{r Well_Median, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(well.df) + aes(x = day, y = median.activity) + geom_line() + facet_grid(row ~ col, labeller = label_strains) +
+  labs(x = "Time (day)", y = "Median Activity") + presentation
+
+```
+
+## Well Total Data ##
+
+```{r Well_Total, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(well.df) + aes(x = day, y = total.activity) + geom_line() + facet_grid(row ~ col, labeller = label_strains) +
+  labs(x = "Time (day)", y = "Aggregate Activity") + presentation
 
 ```
 
@@ -176,7 +195,7 @@ ggplot(well.df) + aes(x = day, y = activity) + geom_line() + facet_grid(row ~ co
 
 well.df <- well.df %>%
   group_by(col, row) %>%
-  mutate(norm.activity = 100 * activity / max(activity, na.rm = TRUE))
+  mutate(norm.act = 100 * total.activity / max(total.activity, na.rm = TRUE))
 
 well.df <- ungroup(well.df)
 
@@ -186,7 +205,7 @@ save(well.df, file = paste(processedDataPath, "/", experimentName, "_Well.Rda", 
 
 ```{r Well_Normalized, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(well.df) + aes(x = day, y = norm.activity) + ylim(0, 100) + geom_line() + facet_grid(row ~ col, labeller = label_strains) +
+ggplot(well.df) + aes(x = day, y = norm.act) + ylim(0, 100) + geom_line() + facet_grid(row ~ col, labeller = label_strains) +
   labs(x = "Time (day)", y = "Normalized Activity") + presentation
 
 ```
@@ -197,9 +216,9 @@ ggplot(well.df) + aes(x = day, y = norm.activity) + ylim(0, 100) + geom_line() +
 
 well.df <- well.df %>%
   group_by(col, row) %>%
-  mutate(max.sum = day[which.max(norm.activity)[1]]) %>%
+  mutate(max.sum = day[which.max(norm.act)[1]]) %>%
   group_by(row) %>%
-  mutate(adjusted.activity = ifelse(day < max.sum, 100, norm.activity))
+  mutate(adjusted.activity = ifelse(day < max.sum, 100, norm.act))
 well.df <- ungroup(well.df)
   
 ```
@@ -221,7 +240,7 @@ l = 1
 
 for (x in 1:12) {
   for (y in rows) {
-    if (!(is.na(well.df$norm.activity[well.df$row == y & well.df$col == x]))[1] == TRUE) {
+    if (!(is.na(well.df$norm.act[well.df$row == y & well.df$col == x]))[1] == TRUE) {
       temp <- nlm(well_twoplog, c(2, 1), well.df, y, x)[["estimate"]]
       well_params.df$bparam[l] <- temp[1]
       well_params.df$cparam[l] <- temp[2]
@@ -261,7 +280,7 @@ well_survivals.df <- well_survivals.df %>% gather(strain, yvalue, 2:97)
 well.df$yvalue <- well_survivals.df$yvalue
 
 for (i in 1:nrow(well.df)) {
-  if (is.na(well.df$norm.activity[i]) == TRUE) {
+  if (is.na(well.df$norm.act[i]) == TRUE) {
     well.df$yvalue[i] <- NA
   }
 }
@@ -270,11 +289,11 @@ for (i in 1:nrow(well.df)) {
 
 ```{r Well_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(well.df) + geom_line(aes(x = day, y = norm.activity)) + ylim(0, 100) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(row ~ col, labeller = label_strains) + presentation
+ggplot(well.df) + geom_line(aes(x = day, y = norm.act)) + ylim(0, 100) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(row ~ col, labeller = label_strains) + presentation
 
 ```
 
-## Strain Data ##
+## Strain Mean Data ##
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
@@ -283,10 +302,10 @@ ggplot(well.df) + geom_line(aes(x = day, y = norm.activity)) + ylim(0, 100) + ge
 
 strain.df <- well.df %>%
   group_by(strain, day) %>%
-  summarise(mean.activity = mean(norm.activity, na.rm = TRUE), 
-            sd.activity = sd(norm.activity, na.rm = TRUE), 
-            median.activity = median(norm.activity, na.rm = TRUE), 
-            total.activity = sum(norm.activity, na.rm = TRUE))
+  summarise(mean.activity = mean(total.activity, na.rm = TRUE), 
+            sd.activity = sd(total.activity, na.rm = TRUE), 
+            median.activity = median(total.activity, na.rm = TRUE), 
+            total.activity = sum(total.activity, na.rm = TRUE))
 
 strain.df <- ungroup(strain.df)
 
@@ -298,12 +317,29 @@ for (i in 1:nrow(strain.df)) {
 
 ```
 
-```{r Strain_Mean_Median, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+```{r Strain_Mean, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
 ggplot(strain.df) + geom_line(aes(x = day, y = mean.activity)) + 
   geom_errorbar(aes(x = day, ymin = mean.activity - sd.activity, ymax = mean.activity + sd.activity)) + 
-  geom_line(aes(x = day, y = median.activity), color = "red") +
-  facet_wrap( ~ strain) + labs(x = "Time (day)", y = "Activity") + presentation
+  facet_wrap( ~ strain) + labs(x = "Time (day)", y = "Mean Activity") + presentation
+
+```
+
+## Strain Median Data ##
+
+```{r Strain_Median, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(strain.df) + aes(x = day, y = median.activity) + geom_line() + facet_wrap( ~ strain) +
+  labs(x = "Time (day)", y = "Median Activity") + presentation
+
+```
+
+## Strain Total Data ##
+
+```{r Strain_Total, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(strain.df) + aes(x = day, y = total.activity) + geom_line() + facet_wrap( ~ strain) +
+  labs(x = "Time (day)", y = "Activity") + presentation
 
 ```
 
@@ -313,7 +349,7 @@ ggplot(strain.df) + geom_line(aes(x = day, y = mean.activity)) +
 
 strain.df <- strain.df %>%
   group_by(strain) %>%
-  mutate(norm.activity = 100 * total.activity / max(total.activity, na.rm = TRUE))
+  mutate(norm.act = 100 * total.activity / max(total.activity, na.rm = TRUE))
 
 strain.df <- ungroup(strain.df)
 
@@ -321,7 +357,7 @@ strain.df <- ungroup(strain.df)
 
 ```{r Strain_Normalized, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(strain.df) + aes(x = day, y = norm.activity) + ylim(0, 100) + geom_line() + facet_wrap( ~ strain) + 
+ggplot(strain.df) + aes(x = day, y = norm.act) + ylim(0, 100) + geom_line() + facet_wrap( ~ strain) + 
   labs(x = "Time (day)", y = "Normalized Activity") + presentation
 
 ```
@@ -332,14 +368,14 @@ ggplot(strain.df) + aes(x = day, y = norm.activity) + ylim(0, 100) + geom_line()
 
 strain.df <- strain.df %>%
   group_by(strain) %>%
-  mutate(max.sum = day[which.max(norm.activity)[1]]) #%>%
+  mutate(max.sum = day[which.max(norm.act)[1]]) #%>%
   #mutate(adjusted.activity = ifelse(day < max.sum, 100, norm.act))
 
 strain.df <- ungroup(strain.df)
 strain.df$adjusted.activity <- rep(0, length(strain.df$day))
 
 for (i in 1:nrow(strain.df)) {
-  strain.df$adjusted.activity[i] <- ifelse(strain.df$day[i] < strain.df$max.sum[i], 100, strain.df$norm.activity[i])
+  strain.df$adjusted.activity[i] <- ifelse(strain.df$day[i] < strain.df$max.sum[i], 100, strain.df$norm.act[i])
 }
 
 ```
@@ -360,7 +396,7 @@ strain_params.df <- data.frame(strain = unique(strains), bparam = rep(0, length(
 l = 1
 
 for (x in unique(strains)) {
-  if(!(is.na(strain.df$norm.activity[strain.df$strain == x]))[1] == TRUE) {
+  if(!(is.na(strain.df$norm.act[strain.df$strain == x]))[1] == TRUE) {
     temp <- nlm(strain_twoplog, c(2, 2), strain.df, x)[["estimate"]]
     strain_params.df$bparam[l] <- temp[1]
     strain_params.df$cparam[l] <- temp[2]
@@ -394,7 +430,7 @@ strain_survivals.df <- strain_survivals.df %>% gather(strain, yvalue, 2:4)
 strain.df$yvalue <- strain_survivals.df$yvalue
 
 for (i in 1:nrow(strain.df)) {
-  if (is.na(strain.df$norm.activity[i]) == TRUE) {
+  if (is.na(strain.df$norm.act[i]) == TRUE) {
     strain.df$yvalue[i] <- NA
   }
 }
@@ -403,6 +439,6 @@ for (i in 1:nrow(strain.df)) {
 
 ```{r Strain_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(strain.df) + geom_line(aes(x = day, y = norm.activity)) + ylim(0, 100) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ strain) + presentation
+ggplot(strain.df) + geom_line(aes(x = day, y = norm.act)) + ylim(0, 100) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ strain) + presentation
 
 ```
