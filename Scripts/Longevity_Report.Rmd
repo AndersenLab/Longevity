@@ -161,7 +161,7 @@ well.df$uniqueStrain <- rep(uniqueStrains, each = replicates * nFiles)
 
 ```{r Well, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(well.df) + aes(x = day, y = activity) + geom_line() + facet_grid(row ~ col, labeller = label_strains) +
+ggplot(well.df) + aes(x = day, y = activity) + geom_point() + facet_grid(row ~ col, labeller = label_strains) +
   labs(x = "Time (day)", y = "Activity") + presentation
 
 ```
@@ -186,7 +186,7 @@ save(well.df, file = paste(processedDataPath, "/", experimentName, "_Well.Rda", 
 
 ```{r Well_Normalized, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(well.df) + aes(x = day, y = norm.activity) + ylim(0, 100) + geom_line() + facet_grid(row ~ col, labeller = label_strains) +
+ggplot(well.df) + aes(x = day, y = norm.activity) + ylim(0, 100) + geom_point() + facet_grid(row ~ col, labeller = label_strains) +
   labs(x = "Time (day)", y = "Normalized Activity") + presentation
 
 ```
@@ -206,7 +206,7 @@ well.df <- ungroup(well.df)
 
 ```{r Well_Adjusted, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(well.df) + aes(x = day, y = adjusted.activity) + geom_line() + facet_grid(row ~ col, labeller = label_strains) +
+ggplot(well.df) + aes(x = day, y = adjusted.activity) + geom_point() + facet_grid(row ~ col, labeller = label_strains) +
   labs(x = "Time (day)", y = "Adjusted Activity") + presentation
 
 ```
@@ -270,7 +270,7 @@ for (i in 1:nrow(well.df)) {
 
 ```{r Well_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(well.df) + geom_line(aes(x = day, y = norm.activity)) + ylim(0, 100) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(row ~ col, labeller = label_strains) + presentation
+ggplot(well.df) + geom_point(aes(x = day, y = norm.activity)) + ylim(0, 100) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(row ~ col, labeller = label_strains) + presentation
 
 ```
 
@@ -300,7 +300,7 @@ for (i in 1:nrow(strain.df)) {
 
 ```{r Strain_Mean_Median, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(strain.df) + geom_line(aes(x = day, y = mean.activity)) + 
+ggplot(strain.df) + geom_point(aes(x = day, y = mean.activity)) + 
   geom_errorbar(aes(x = day, ymin = mean.activity - sd.activity, ymax = mean.activity + sd.activity)) + 
   geom_line(aes(x = day, y = median.activity), color = "red") +
   facet_wrap( ~ strain) + labs(x = "Time (day)", y = "Activity") + presentation
@@ -321,7 +321,7 @@ strain.df <- ungroup(strain.df)
 
 ```{r Strain_Normalized, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(strain.df) + aes(x = day, y = norm.activity) + ylim(0, 100) + geom_line() + facet_wrap( ~ strain) + 
+ggplot(strain.df) + aes(x = day, y = norm.activity) + ylim(0, 100) + geom_point() + facet_wrap( ~ strain) + 
   labs(x = "Time (day)", y = "Normalized Activity") + presentation
 
 ```
@@ -346,7 +346,7 @@ for (i in 1:nrow(strain.df)) {
 
 ```{r Strain_Adjusted, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(strain.df) + aes(x = day, y = adjusted.activity) + ylim(0, 100) + geom_line() + facet_wrap( ~ strain) +
+ggplot(strain.df) + aes(x = day, y = adjusted.activity) + ylim(0, 100) + geom_point() + facet_wrap( ~ strain) +
   labs(x = "Time (day)", y = "Adjusted Activity") + presentation
 
 ```
@@ -403,6 +403,6 @@ for (i in 1:nrow(strain.df)) {
 
 ```{r Strain_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
 
-ggplot(strain.df) + geom_line(aes(x = day, y = norm.activity)) + ylim(0, 100) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ strain) + presentation
+ggplot(strain.df) + geom_point(aes(x = day, y = norm.activity)) + ylim(0, 100) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ strain) + presentation
 
 ```
