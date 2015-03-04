@@ -7,16 +7,183 @@ output: html_document
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
+library("knitr")
+library("stringr")
+library("plyr")
+library("dplyr")
+library("ggplot2")
+library("tidyr")
+
 source("./Scripts/survival_fxns.R")
+experimentName <- "p04_3mgmL"
 source(paste("./Scripts/", experimentName, ".R", sep = ""))
 processedDataPath <- paste("./Data/Processed/", experimentName, sep = "")
 saveDataLocation <- paste(processedDataPath, "/", experimentName, sep = "")
 
 load(paste("./Data/Processed/", experimentName, "/", experimentName, "_Well.Rda", sep = ""))
 
+ggplot(well.df) + aes(x = day, y = activity) + geom_line() + facet_grid(row ~ uniqueStrain) + presentation
+
+```
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+## Let's group the wells into pairs and perform curve fitting. ##
+
+files <- dir(path = paste("./Data/Raw/", experimentName, sep = ""), 
+             pattern = ".txt", 
+             full.names = TRUE)
+nFiles <- length(files)
+
+well.df$grouping <- rep(rep(1:4, each = nFiles * 2), 12)
+
+well_twos.df <- well.df %>%
+  group_by(uniqueStrain, grouping, day) %>%
+  summarise(activity = mean(activity, na.rm = TRUE))
+well_twos.df <- ungroup(well_twos.df)
+
+ggplot(well_twos.df) + aes(x = day, y = activity) + geom_line() + facet_grid(grouping ~ uniqueStrain) + presentation
+
+```
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+well.df$grouping <- rep(rep(c(1, 1, 1, 2, 2, 2, 3, 3), each = nFiles), 12)
+
+well_threes.df <- well.df %>%
+  group_by(uniqueStrain, grouping, day) %>%
+  summarise(activity = mean(activity, na.rm = TRUE))
+well_threes.df <- ungroup(well_threes.df)
+
+ggplot(well_threes.df) + aes(x = day, y = activity) + geom_line() + facet_grid(grouping ~ uniqueStrain) + presentation
+
+```
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+well.df$grouping <- rep(rep(1:2, each = nFiles * 4), 12)
+
+well_fours.df <- well.df %>%
+  group_by(uniqueStrain, grouping, day) %>%
+  summarise(activity = mean(activity, na.rm = TRUE))
+well_fours.df <- ungroup(well_fours.df)
+
+ggplot(well_fours.df) + aes(x = day, y = activity) + geom_line() + facet_grid(grouping ~ uniqueStrain) + presentation
+
+```
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+strain.df <- well.df %>%
+  group_by(uniqueStrain, day) %>%
+  summarise(activity = mean(activity, na.rm = TRUE))
+strain.df <- ungroup(strain.df)
+
+ggplot(strain.df) + aes(x = day, y = activity) + geom_line() + facet_wrap( ~ uniqueStrain) + presentation
+
 ```
 
 ## Well Curve Fitting ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE, results = "asis"}
+
+well_params.df <- data.frame(col = rep(1:12, each = length(rows)), row = rep(rows, nStrains), bparam = rep(0, nStrains * replicates), cparam = rep(0, nStrains * replicates))
+
+l = 1
+
+for (x in 1:12) {
+  for (y in rows) {
+    if (!(is.na(well.df$norm.activity[well.df$row == y & well.df$col == x]))[1] == TRUE) {
+      temp <- nlm(well_twoplog, c(2, 1), well.df, y, x)[["estimate"]]
+      well_params.df$bparam[l] <- temp[1]
+      well_params.df$cparam[l] <- temp[2]
+    }
+    l = l + 1
+  }
+}
+
+save(well_params.df, file = paste(processedDataPath, "/", experimentName, "_Well_Params.Rda", sep = ""), ascii = TRUE)
+
+kable(well_params.df)
+
+```
+
+## Well Twos Curve Fitting ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE, results = "asis"}
+
+well_twos_params.df <- data.frame(col = rep(1:12, each = 4), grouping = rep(1:4, nStrains), bparam = rep(0, nStrains * 4), cparam = rep(0, nStrains * 4))
+
+l = 1
+
+for (x in uniqueStrains) {
+  for (y in 1:4) {
+    if (!(is.na(well.df$norm.activity[well_twos.df$grouping == y & well_twos.df$uniqueStrain == x]))[1] == TRUE) {
+      temp <- nlm(well_twoplog_grouping, c(2, 1), well.df, y, x)[["estimate"]]
+      well_params.df$bparam[l] <- temp[1]
+      well_params.df$cparam[l] <- temp[2]
+    }
+    l = l + 1
+  }
+}
+
+save(well_params.df, file = paste(processedDataPath, "/", experimentName, "_Well_Params.Rda", sep = ""), ascii = TRUE)
+
+kable(well_params.df)
+
+```
+
+## Well Threes Curve Fitting ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE, results = "asis"}
+
+well_params.df <- data.frame(col = rep(1:12, each = length(rows)), row = rep(rows, nStrains), bparam = rep(0, nStrains * replicates), cparam = rep(0, nStrains * replicates))
+
+l = 1
+
+for (x in 1:12) {
+  for (y in rows) {
+    if (!(is.na(well.df$norm.activity[well.df$row == y & well.df$col == x]))[1] == TRUE) {
+      temp <- nlm(well_twoplog, c(2, 1), well.df, y, x)[["estimate"]]
+      well_params.df$bparam[l] <- temp[1]
+      well_params.df$cparam[l] <- temp[2]
+    }
+    l = l + 1
+  }
+}
+
+save(well_params.df, file = paste(processedDataPath, "/", experimentName, "_Well_Params.Rda", sep = ""), ascii = TRUE)
+
+kable(well_params.df)
+
+```
+
+## Well Fours Curve Fitting ##
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE, results = "asis"}
+
+well_params.df <- data.frame(col = rep(1:12, each = length(rows)), row = rep(rows, nStrains), bparam = rep(0, nStrains * replicates), cparam = rep(0, nStrains * replicates))
+
+l = 1
+
+for (x in 1:12) {
+  for (y in rows) {
+    if (!(is.na(well.df$norm.activity[well.df$row == y & well.df$col == x]))[1] == TRUE) {
+      temp <- nlm(well_twoplog, c(2, 1), well.df, y, x)[["estimate"]]
+      well_params.df$bparam[l] <- temp[1]
+      well_params.df$cparam[l] <- temp[2]
+    }
+    l = l + 1
+  }
+}
+
+save(well_params.df, file = paste(processedDataPath, "/", experimentName, "_Well_Params.Rda", sep = ""), ascii = TRUE)
+
+kable(well_params.df)
+
+```
+
+## Strain Curve Fitting ##
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE, results = "asis"}
 
