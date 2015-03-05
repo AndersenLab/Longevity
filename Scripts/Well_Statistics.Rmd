@@ -7,13 +7,6 @@ output: html_document
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE, fig.width = 15, fig.height = 12}
 
-library("knitr")
-library("stringr")
-library("plyr")
-library("dplyr")
-library("ggplot2")
-library("tidyr")
-
 source("./Scripts/survival_fxns.R")
 experimentName <- "p04_3mgmL"
 source(paste("./Scripts/", experimentName, ".R", sep = ""))
@@ -131,7 +124,7 @@ ggplot(strain.df) + aes(x = day, y = activity) + geom_line() + facet_wrap( ~ uni
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
-well_params.df <- data.frame(col = rep(1:12, each = length(rows)), row = rep(rows, nStrains), bparam = rep(0, nStrains * replicates), cparam = rep(0, nStrains * replicates))
+well_params.df <- data.frame(strain = rep(strains, each = length(rows)), row = rep(rows, nStrains), bparam = rep(0, nStrains * replicates), cparam = rep(0, nStrains * replicates))
 
 l = 1
 
@@ -150,7 +143,7 @@ for (x in 1:12) {
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
-well_twos_params.df <- data.frame(col = rep(1:12, each = 4), grouping = rep(1:4, nStrains), bparam = rep(0, nStrains * 4), cparam = rep(0, nStrains * 4))
+well_twos_params.df <- data.frame(strain = rep(strains, each = 4), grouping = rep(1:4, nStrains), bparam = rep(0, nStrains * 4), cparam = rep(0, nStrains * 4))
 
 l = 1
 
@@ -169,7 +162,7 @@ for (x in 1:12) {
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
-well_threes_params.df <- data.frame(col = rep(1:12, each = 3), grouping = rep(1:3, nStrains), bparam = rep(0, nStrains * 3), cparam = rep(0, nStrains * 3))
+well_threes_params.df <- data.frame(strain = rep(strains, each = 3), grouping = rep(1:3, nStrains), bparam = rep(0, nStrains * 3), cparam = rep(0, nStrains * 3))
 
 l = 1
 
@@ -188,7 +181,7 @@ for (x in 1:12) {
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
-well_fours_params.df <- data.frame(col = rep(1:12, each = 2), grouping = rep(1:2, nStrains), bparam = rep(0, nStrains * 2), cparam = rep(0, nStrains * 2))
+well_fours_params.df <- data.frame(strain = rep(strains, each = 2), grouping = rep(1:2, nStrains), bparam = rep(0, nStrains * 2), cparam = rep(0, nStrains * 2))
 
 l = 1
 
@@ -207,7 +200,7 @@ for (x in 1:12) {
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
 
-strain_params.df <- data.frame(col = rep(1:12), bparam = rep(0, nStrains), cparam = rep(0, nStrains))
+strain_params.df <- data.frame(strain = strains, bparam = rep(0, nStrains), cparam = rep(0, nStrains))
 
 l = 1
 
@@ -229,5 +222,19 @@ kable(well_twos_params.df)
 kable(well_threes_params.df)
 kable(well_fours_params.df)
 kable(strain_params.df)
+
+params.df <- well_params.df %>% bind_rows(well_twos_params.df) %>% bind_rows(well_threes_params.df) %>% bind_rows(well_fours_params.df) %>% bind_rows(strain_params.df)
+params.df$grouping <- c(rep("well", nrow(well_params.df)), rep("twos", nrow(well_twos_params.df)), rep("threes", nrow(well_threes_params.df)), rep("fours", nrow(well_fours_params.df)), rep("strain", nrow(strain_params.df)))
+
+params.df$grouping <- ordered(params.df$grouping, levels = c("well", "twos", "threes", "fours", "strain"))
+
+for (i in 1:nrow(params.df)) {
+  if (params.df$bparam[i] == 0 & params.df$cparam[i] == 0) {
+    params.df$bparam[i] <- NA
+    params.df$cparam[i] <- NA
+  }
+}
+
+ggplot(params.df) + aes(x = log(bparam), y = log(cparam), size = grouping, color = strain) + geom_point(alpha = 0.5) + facet_wrap( ~ strain)
 
 ```
