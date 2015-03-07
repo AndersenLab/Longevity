@@ -13,16 +13,13 @@ library("dplyr")
 library("ggplot2")
 library("tidyr")
 
-experiments.file <- dir(path = "./Scripts", "p03", full.names = TRUE)
+experiments.file <- dir(path = "./Scripts", "p04", full.names = TRUE)
 opts_knit$set(root.dir = getwd())
 
 for (i in 1:length(experiments.file)) {
   experimentName <- str_split(str_split(experiments.file[i], "Scripts/")[[1]][2], ".R")[[1]][1]
   knit2html("./Scripts/Longevity_Report.Rmd", 
             output = paste("./Results/", experimentName, "_Report.html", sep = ""),
-            stylesheet = "./Scripts/foghorn_edited.css")
-  knit2html("./Scripts/Well_Statistics.Rmd",
-            output = paste("./Results/", experimentName, "_Well_Stats_Report.html", sep = ""),
             stylesheet = "./Scripts/foghorn_edited.css")
 }
 
@@ -33,7 +30,4 @@ opts_knit$set(root.dir = getwd())
 experimentName <- str_split(str_split(experiments.file[1], "Scripts/")[[1]][2], ".R")[[1]][1]
 knit2html("./Scripts/Longevity_Report.Rmd", 
           output = paste("./Results/", experimentName, "_Report.html", sep = ""),
-          stylesheet = "./Scripts/foghorn_edited.css")
-knit2html("./Scripts/Well_Statistics.Rmd",
-          output = paste("./Results/", experimentName, "_Well_Stats_Report.html", sep = ""),
           stylesheet = "./Scripts/foghorn_edited.css")
