@@ -156,14 +156,21 @@ well.df <- well.df %>%
   mutate(norm.activity = 100 * activity / max(activity, na.rm = TRUE))
 well.df <- ungroup(well.df)
 
+well.df <- well.df %>%
+  group_by(col, row) %>%
+  mutate(max.sum = day[which.max(norm.activity)[1]]) %>%
+  group_by(row) %>%
+  mutate(adjusted.activity = ifelse(day < max.sum, 100, norm.activity))
+well.df <- ungroup(well.df)
+
 well_params.df <- data.frame(strain = rep(strains, each = length(rows)), col = rep(1:12, each = length(rows)), row = rep(rows, nStrains), bparam = rep(0, nStrains * replicates), cparam = rep(0, nStrains * replicates))
 
 l = 1
 
 for (x in 1:12) {
   for (y in rows) {
-    if (!(is.na(well.df$norm.activity[well.df$row == y & well.df$col == x]))[1] == TRUE) {
-      temp <- nlm(well_twoplog, c(2, 1), well.df, y, x)[["estimate"]]
+    if (!(is.na(well.df$adjusted.activity[well.df$row == y & well.df$col == x]))[1] == TRUE) {
+      temp <- nlm(well_twoplog_adjusted, c(2, 10), well.df, y, x)[["estimate"]]
       well_params.df$bparam[l] <- temp[1]
       well_params.df$cparam[l] <- temp[2]
     }
@@ -186,12 +193,12 @@ well_survivals.df <- well_survivals.df %>% gather(strain, yvalue, 2:97)
 well.df$yvalue <- well_survivals.df$yvalue
 
 for (i in 1:nrow(well.df)) {
-  if (is.na(well.df$norm.activity[i]) == TRUE) {
+  if (is.na(well.df$adjusted.activity[i]) == TRUE) {
     well.df$yvalue[i] <- NA
   }
 }
 
-ggplot(well.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(row ~ col, labeller = label_strains) + ylim(0, 100) + presentation
+ggplot(well.df) + geom_point(aes(x = day, y = adjusted.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(row ~ col, labeller = label_strains) + ylim(0, 100) + presentation
 
 ```
 
@@ -213,9 +220,17 @@ well_twos.df <- well_twos.df %>%
   mutate(norm.activity = 100 * activity / max(activity, na.rm = TRUE))
 well_twos.df <- ungroup(well_twos.df)
 
+well_twos.df <- well_twos.df %>%
+  group_by(col, grouping) %>%
+  mutate(max.sum = day[which.max(norm.activity)[1]]) %>%
+  group_by(grouping) %>%
+  mutate(adjusted.activity = ifelse(day < max.sum, 100, norm.activity))
+well_twos.df <- ungroup(well_twos.df)
+
 for (i in 1:nrow(well_twos.df)) {
   if (!is.finite(well_twos.df$activity[i])) well_twos.df$activity[i] <- NA
   if (!is.finite(well_twos.df$norm.activity[i])) well_twos.df$norm.activity[i] <- NA
+  if (!is.finite(well_twos.df$adjusted.activity[i])) well_twos.df$adjusted.activity[i] <- NA
 }
 
 well_twos_params.df <- data.frame(strain = rep(strains, each = 4), col = rep(1:12, each = 4), grouping = rep(1:4, nStrains), bparam = rep(0, nStrains * 4), cparam = rep(0, nStrains * 4))
@@ -224,8 +239,8 @@ l = 1
 
 for (x in 1:12) {
   for (y in 1:4) {
-    if (!(is.na(well_twos.df$norm.activity[well_twos.df$grouping == y & well_twos.df$col == x]))[1] == TRUE) {
-      temp <- nlm(well_twoplog_grouping, c(2, 1), well_twos.df, y, x)[["estimate"]]
+    if (!(is.na(well_twos.df$adjusted.activity[well_twos.df$grouping == y & well_twos.df$col == x]))[1] == TRUE) {
+      temp <- nlm(well_twoplog_grouping_adjusted, c(2, 10), well_twos.df, y, x)[["estimate"]]
       well_twos_params.df$bparam[l] <- temp[1]
       well_twos_params.df$cparam[l] <- temp[2]
     }
@@ -248,12 +263,12 @@ well_twos_survivals.df <- well_twos_survivals.df %>% gather(strain, yvalue, 2:49
 well_twos.df$yvalue <- well_twos_survivals.df$yvalue
 
 for (i in 1:nrow(well_twos.df)) {
-  if (is.na(well_twos.df$norm.activity[i]) == TRUE) {
+  if (is.na(well_twos.df$adjusted.activity[i]) == TRUE) {
     well_twos.df$yvalue[i] <- NA
   }
 }
 
-ggplot(well_twos.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation
+ggplot(well_twos.df) + geom_point(aes(x = day, y = adjusted.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation
 
 ```
 
@@ -273,9 +288,17 @@ well_threes.df <- well_threes.df %>%
   mutate(norm.activity = 100 * activity / max(activity, na.rm = TRUE))
 well_threes.df <- ungroup(well_threes.df)
 
+well_threes.df <- well_threes.df %>%
+  group_by(col, grouping) %>%
+  mutate(max.sum = day[which.max(norm.activity)[1]]) %>%
+  group_by(grouping) %>%
+  mutate(adjusted.activity = ifelse(day < max.sum, 100, norm.activity))
+well_threes.df <- ungroup(well_threes.df)
+
 for (i in 1:nrow(well_threes.df)) {
   if (!is.finite(well_threes.df$activity[i])) well_threes.df$activity[i] <- NA
   if (!is.finite(well_threes.df$norm.activity[i])) well_threes.df$norm.activity[i] <- NA
+  if (!is.finite(well_threes.df$adjusted.activity[i])) well_threes.df$adjusted.activity[i] <- NA
 }
 
 well_threes_params.df <- data.frame(strain = rep(strains, each = 3), col = rep(1:12, each = 3), grouping = rep(1:3, nStrains), bparam = rep(0, nStrains * 3), cparam = rep(0, nStrains * 3))
@@ -284,8 +307,8 @@ l = 1
 
 for (x in 1:12) {
   for (y in 1:3) {
-    if (!(is.na(well_threes.df$norm.activity[well_threes.df$grouping == y & well_threes.df$col == x]))[1] == TRUE) {
-      temp <- nlm(well_twoplog_grouping, c(2, 1), well_threes.df, y, x)[["estimate"]]
+    if (!(is.na(well_threes.df$adjusted.activity[well_threes.df$grouping == y & well_threes.df$col == x]))[1] == TRUE) {
+      temp <- nlm(well_twoplog_grouping_adjusted, c(2, 10), well_threes.df, y, x)[["estimate"]]
       well_threes_params.df$bparam[l] <- temp[1]
       well_threes_params.df$cparam[l] <- temp[2]
     }
@@ -308,12 +331,12 @@ well_threes_survivals.df <- well_threes_survivals.df %>% gather(strain, yvalue, 
 well_threes.df$yvalue <- well_threes_survivals.df$yvalue
 
 for (i in 1:nrow(well_threes.df)) {
-  if (is.na(well_threes.df$norm.activity[i]) == TRUE) {
+  if (is.na(well_threes.df$adjusted.activity[i]) == TRUE) {
     well_threes.df$yvalue[i] <- NA
   }
 }
 
-ggplot(well_threes.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation
+ggplot(well_threes.df) + geom_point(aes(x = day, y = adjusted.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation
 
 ```
 
@@ -333,9 +356,17 @@ well_fours.df <- well_fours.df %>%
   mutate(norm.activity = 100 * activity / max(activity, na.rm = TRUE))
 well_fours.df <- ungroup(well_fours.df)
 
+well_fours.df <- well_fours.df %>%
+  group_by(col, grouping) %>%
+  mutate(max.sum = day[which.max(norm.activity)[1]]) %>%
+  group_by(grouping) %>%
+  mutate(adjusted.activity = ifelse(day < max.sum, 100, norm.activity))
+well_fours.df <- ungroup(well_fours.df)
+
 for (i in 1:nrow(well_fours.df)) {
   if (!is.finite(well_fours.df$activity[i])) well_fours.df$activity[i] <- NA
   if (!is.finite(well_fours.df$norm.activity[i])) well_fours.df$norm.activity[i] <- NA
+  if (!is.finite(well_fours.df$adjusted.activity[i])) well_fours.df$adjusted.activity[i] <- NA
 }
 
 well_fours_params.df <- data.frame(strain = rep(strains, each = 2), col = rep(1:12, each = 2), grouping = rep(1:2, nStrains), bparam = rep(0, nStrains * 2), cparam = rep(0, nStrains * 2))
@@ -344,8 +375,8 @@ l = 1
 
 for (x in 1:12) {
   for (y in 1:2) {
-    if (!(is.na(well_fours.df$norm.activity[well_fours.df$grouping == y & well_fours.df$col == x]))[1] == TRUE) {
-      temp <- nlm(well_twoplog_grouping, c(2, 1), well_fours.df, y, x)[["estimate"]]
+    if (!(is.na(well_fours.df$adjusted.activity[well_fours.df$grouping == y & well_fours.df$col == x]))[1] == TRUE) {
+      temp <- nlm(well_twoplog_grouping_adjusted, c(2, 1), well_fours.df, y, x)[["estimate"]]
       well_fours_params.df$bparam[l] <- temp[1]
       well_fours_params.df$cparam[l] <- temp[2]
     }
@@ -368,12 +399,12 @@ well_fours_survivals.df <- well_fours_survivals.df %>% gather(strain, yvalue, 2:
 well_fours.df$yvalue <- well_fours_survivals.df$yvalue
 
 for (i in 1:nrow(well_fours.df)) {
-  if (is.na(well_fours.df$norm.activity[i]) == TRUE) {
+  if (is.na(well_fours.df$adjusted.activity[i]) == TRUE) {
     well_fours.df$yvalue[i] <- NA
   }
 }
 
-ggplot(well_fours.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation
+ggplot(well_fours.df) + geom_point(aes(x = day, y = adjusted.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation
 
 ```
 
@@ -391,9 +422,17 @@ strain.df <- strain.df %>%
   mutate(norm.activity = 100 * activity / max(activity, na.rm = TRUE))
 strain.df <- ungroup(strain.df)
 
+strain.df <- strain.df %>%
+  group_by(strain) %>%
+  mutate(max.sum = day[which.max(norm.activity)[1]]) %>%
+  group_by(strain) %>%
+  mutate(adjusted.activity = ifelse(day < max.sum, 100, norm.activity))
+strain.df <- ungroup(strain.df)
+
 for (i in 1:nrow(strain.df)) {
   if (!is.finite(strain.df$activity[i])) strain.df$activity[i] <- NA
   if (!is.finite(strain.df$norm.activity[i])) strain.df$norm.activity[i] <- NA
+  if (!is.finite(strain.df$adjusted.activity[i])) strain.df$adjusted.activity[i] <- NA
 }
 
 strain_params.df <- data.frame(strain = unique(strains), bparam = rep(0, length(unique(strains))), cparam = rep(0, length(unique(strains))))
@@ -401,8 +440,8 @@ strain_params.df <- data.frame(strain = unique(strains), bparam = rep(0, length(
 l = 1
 
 for (x in unique(strains)) {
-  if (!(is.na(strain.df$norm.activity[strain.df$strain == x]))[1] == TRUE) {
-    temp <- nlm(strain_twoplog, c(2, 1), strain.df, x)[["estimate"]]
+  if (!(is.na(strain.df$adjusted.activity[strain.df$strain == x]))[1] == TRUE) {
+    temp <- nlm(strain_twoplog_adjusted, c(2, 10), strain.df, x)[["estimate"]]
     strain_params.df$bparam[l] <- temp[1]
     strain_params.df$cparam[l] <- temp[2]
   }
@@ -422,12 +461,12 @@ strain_survivals.df <- strain_survivals.df %>% gather(strain, yvalue, 2:(ncol(st
 strain.df$yvalue <- strain_survivals.df$yvalue
 
 for (i in 1:nrow(strain.df)) {
-  if (is.na(strain.df$norm.activity[i]) == TRUE) {
+  if (is.na(strain.df$adjusted.activity[i]) == TRUE) {
     strain.df$yvalue[i] <- NA
   }
 }
 
-ggplot(strain.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ strain) + ylim(0, 100) + presentation
+ggplot(strain.df) + geom_point(aes(x = day, y = adjusted.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ strain) + ylim(0, 100) + presentation
 
 ```
 

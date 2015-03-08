@@ -23,15 +23,19 @@ well_twoplog_grouping <- function(input, df, grouping, col) {
 }
 
 strain_twoplog <- function(input, df, strain) {
-  if (length(unique(strains)) == length(unique(uniqueStrains))) {
-    sum(((100 / (1 + ((df$day[df$strain == strain] / input[2]) ^ input[1]))) - df$norm.activity[df$strain == strain]) ^ 2)
-  } else {
-    sum(((100 / (1 + ((df$day[df$uniqueStrain == strain] / input[2]) ^ input[1]))) - df$norm.activity[df$uniqueStrain == strain]) ^ 2)
-  }
+  sum(((100 / (1 + ((df$day[df$strain == strain] / input[2]) ^ input[1]))) - df$norm.activity[df$strain == strain]) ^ 2)
 }
 
-strain_unique_twoplog <- function(input, df, strain) {
-  sum(((100 / (1 + ((df$day[df$strain == strain] / input[2]) ^ input[1]))) - df$norm.activity[df$strain == strain]) ^ 2)
+well_twoplog_adjusted <- function(input, df, row, col) {
+  sum(((100 / (1 + ((df$day[df$row == row & df$col == col] / input[2]) ^ input[1]))) - df$adjusted.activity[df$row == row & df$col == col]) ^ 2)
+}
+
+well_twoplog_grouping_adjusted <- function(input, df, grouping, col) {
+  sum(((100 / (1 + ((df$day[df$grouping == grouping & df$col == col] / input[2]) ^ input[1]))) - df$adjusted.activity[df$grouping == grouping & df$col == col]) ^ 2)
+}
+
+strain_twoplog_adjusted <- function(input, df, strain) {
+  sum(((100 / (1 + ((df$day[df$strain == strain] / input[2]) ^ input[1]))) - df$adjusted.activity[df$strain == strain]) ^ 2)
 }
 
 well_threeplog <- function(input, df, row, strain) {

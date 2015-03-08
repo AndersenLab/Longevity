@@ -21,6 +21,9 @@ for (i in 1:length(experiments.file)) {
   knit2html("./Scripts/Longevity_Report.Rmd", 
             output = paste("./Results/", experimentName, "_Report.html", sep = ""),
             stylesheet = "./Scripts/foghorn_edited.css")
+  knit2html("./Scripts/Longevity_Report_Adjusted.Rmd", 
+            output = paste("./Results/", experimentName, "_Adjusted_Report.html", sep = ""),
+            stylesheet = "./Scripts/foghorn_edited.css")
 }
 
 ## For testing one experiment ####################################################################
@@ -30,4 +33,7 @@ opts_knit$set(root.dir = getwd())
 experimentName <- str_split(str_split(experiments.file[1], "Scripts/")[[1]][2], ".R")[[1]][1]
 knit2html("./Scripts/Longevity_Report.Rmd", 
           output = paste("./Results/", experimentName, "_Report.html", sep = ""),
+          stylesheet = "./Scripts/foghorn_edited.css")
+knit2html("./Scripts/Longevity_Report_Adjusted.Rmd",
+          output = paste("./Results/", experimentName, "_Adjusted_Report.html", sep = ""),
           stylesheet = "./Scripts/foghorn_edited.css")
