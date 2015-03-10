@@ -1,0 +1,306 @@
+---
+title: "Analysis of Longevity"
+author: "Ryan Abdella"
+date: "January 15, 2015"
+output:
+  html_document:
+    css: ~/Github/Food-Optimization/Scripts/foghorn_edited.css
+---
+
+
+```{r Setup, warning = FALSE, message = FALSE, echo = FALSE}
+
+source("./Scripts/wMT_fxns.R")
+source("./Scripts/survival_fxns.R")
+source(paste("./Scripts/", experimentName, ".R", sep = ""))
+source("./Scripts/Broad_Sense_Heritability_ECA.R")
+
+options(stringsAsFactors = FALSE)
+processedDataPath <- paste("./Data/Processed/", experimentName, sep = "")
+saveDataLocation <- paste(processedDataPath, "/", experimentName, sep = "")
+
+paste(experimentName)
+
+```
+
+```{r, warning = FALSE, echo = FALSE}
+
+## Pull in all the files associated with the current experiment  ##
+## and create a data frame containing all the raw data.          ##
+## Regroup data frame so that it's ordered by strain, replicate, ##
+## and day. Add in strain information.                           ##
+
+files <- dir(path = paste("./Data/Raw/", experimentName, sep = ""), 
+             pattern = ".txt", 
+             full.names = TRUE)
+
+nFiles <- length(files)
+
+fileAttributes.df <- data.frame(binSize = vector(length = nFiles),
+                                time = vector(length = nFiles),
+                                numGroups = vector(length = nFiles),
+                                numBins = vector(length = nFiles))
+
+## Stores the attributes for each experiment. ##
+
+inputList <- list()
+for (i in 1:nFiles) {
+  inputList[[i]] <- processMicrotrackerReport(files[i])
+  fileAttributes.df$binSize[i] = inputList[[i]]$binSize[1]
+  fileAttributes.df$time[i] = inputList[[i]]$time[1]
+  fileAttributes.df$numGroups[i] = inputList[[i]]$numGroups[1]
+  fileAttributes.df$numBins[i] = inputList[[i]]$numBins[1]
+}
+
+## Provide summary about the number of distinct parameters for the experiment.  ##
+## Checks to make sure that all wMicrotracker report files have the same bin    ##
+## size and number of groups. This will provide a message if the markdown fails ##
+## due to inconsistencies of either variable.                                   ##
+
+experimentAttributes.df <- fileAttributes.df %>% summarise_each(funs(n_distinct))
+
+if (experimentAttributes.df$binSize != 1 || experimentAttributes.df$numGroups != 1) {
+  message("Not all wMicrotracker files have the same bin size or number of groups.")
+}
+
+## Need to figure out what the minimum number of bins is so that we can truncate ##
+## files that have more bins than that.                                          ##
+
+minBins <- inputList[[1]]$numBins[1]
+
+for (i in 2:length(inputList)) {
+  minBins <- min(minBins, inputList[[i]]$numBins)
+}
+
+## Now we need to generate a single data frame containing the data from all the ##
+## files for the experiment. We also filter the data so that each day has the   ##
+## same length of data collection.                                              ##
+
+raw.df <- ldply(inputList, generateDataFrameFromFile) %>% 
+  filter(time <= minBins * fileAttributes.df$binSize[1])
+raw.df$day <- rep(pullDateInformation(files), each = nStrains * replicates * minBins)
+
+save(raw.df, file = paste(processedDataPath, "/", experimentName, "_Raw.Rda", sep = ""), ascii = TRUE)
+
+## Let's reorganize the data frame so that all the data for a given well is ##
+## consecutive and add in strain information which is pulled from the       ##
+## experiment configuration file.                                           ##
+
+ordered.df <- raw.df[order(raw.df$col, raw.df$row, raw.df$day), ]
+ordered.df$strain <- rep(strains, each = nFiles * replicates * minBins)
+ordered.df$uniqueStrain <- rep(uniqueStrains, each = nFiles * replicates * minBins)
+ordered.df$num <- rep(nums, each = minBins * nFiles)
+ordered.df <- ordered.df %>%
+  mutate(norm.activity = activity / num)
+
+save(ordered.df, file = paste(processedDataPath, "/", experimentName, "_Processed.Rda", sep = ""), ascii = TRUE)
+
+```
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+label_strains <- function(variable, value) {
+  if (variable == "col") {
+    return(strains[value])
+  } else {
+    return(value)
+  }
+}
+
+draw_twoplog <- function(bparam, cparam) {
+  return((100 / (1 + ((times / cparam) ^ bparam))))
+}
+
+```
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+## Remove both columns and individual wells that were contaminated. ##
+## This information is specified in the experiment configuration    ##
+## file. Need to add the ability to remove only after a certain     ##
+## day.                                                             ##
+
+cleaned.df <- ordered.df
+cleaned.df$norm.activity[(ordered.df$col %in% colRemove)] <- NA
+for(i in 1:nrow(wellRemove)) {
+  cleaned.df$norm.activity[cleaned.df$row == wellRemove$row[i] & cleaned.df$col == wellRemove$col[i]] <- NA
+}
+
+save(cleaned.df, file = paste(processedDataPath, "/", experimentName, "_Cleaned.Rda", sep = ""), ascii = TRUE)
+
+```
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+## Let's combine all the time points on a given day into one data ##
+## point and perform some statistical analyses on those values.   ##
+## This will allow us to determine which, if any, of these values ##
+## are the most heritable.                                        ##
+
+well.df <- cleaned.df %>%
+  group_by(col, row, day) %>%
+  summarize(activity = sum(norm.activity))
+
+well.df <- ungroup(well.df)
+well.df$strain <- rep(strains, each = replicates * nFiles)
+well.df$uniqueStrain <- rep(uniqueStrains, each = replicates * nFiles)
+times <- unique(well.df$day)
+
+```
+
+## Individual Well Fits ##
+
+```{r Well_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+well.df <- well.df %>%
+  group_by(col, row) %>%
+  mutate(norm.activity = 100 * activity / max(activity, na.rm = TRUE))
+well.df <- ungroup(well.df)
+
+well_params.df <- data.frame(strain = rep(strains, each = length(rows)), col = rep(1:12, each = length(rows)), row = rep(rows, nStrains), bparam = rep(0, nStrains * replicates), cparam = rep(0, nStrains * replicates))
+
+l = 1
+
+for (x in 1:12) {
+  for (y in rows) {
+    if (!(is.na(well.df$norm.activity[well.df$row == y & well.df$col == x]))[1] == TRUE) {
+      temp <- nlm(well_twoplog, c(2, 10), well.df, y, x)[["estimate"]]
+      well_params.df$bparam[l] <- temp[1]
+      well_params.df$cparam[l] <- temp[2]
+    }
+    l = l + 1
+  }
+}
+
+well_survivals.df <- data.frame(day = times)
+
+l <- 2
+
+for (x in 1:12) {
+  for (y in rows) {
+    well_survivals.df[l] <- draw_twoplog(well_params.df$bparam[well_params.df$col == x & well_params.df$row == y], well_params.df$cparam[well_params.df$col == x & well_params.df$row == y])
+    l <- l + 1
+  }
+}
+
+well_survivals.df <- well_survivals.df %>% gather(strain, yvalue, 2:97)
+well.df$yvalue <- well_survivals.df$yvalue
+
+for (i in 1:nrow(well.df)) {
+  if (is.na(well.df$norm.activity[i]) == TRUE) {
+    well.df$yvalue[i] <- NA
+  }
+}
+
+ggplot(well.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(row ~ col, labeller = label_strains) + ylim(0, 100) + presentation + guides(color = FALSE)
+
+```
+
+## Two Wells Fits ##
+
+```{r Pair_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+## Let's group the wells into pairs and perform curve fitting. ##
+
+daf2.df <- well.df %>% filter(strain == "daf-2")
+daf2.df$index <- rep(1:32, each = nFiles)
+daf16.df <- well.df %>% filter(strain == "daf-16")
+daf16.df$index <- rep(1:32, each = nFiles)
+N2.df <- well.df %>% filter(strain == "N2")
+N2.df$index <- rep(1:32, each = nFiles)
+
+daf2notNA.df <- daf2.df %>% filter(is.na(activity) != TRUE)
+daf16notNA.df <- daf16.df %>% filter(is.na(activity) != TRUE)
+N2notNA.df <- N2.df %>% filter(is.na(activity) != TRUE)
+
+daf2sample <- unique(daf2notNA.df$index)
+daf2.numWells <- length(daf2sample)
+daf16sample <- unique(daf16notNA.df$index)
+daf16.numWells <- length(daf16sample)
+N2sample <- unique(N2notNA.df$index)
+N2.numWells <- length(N2sample)
+
+master.herit <- data.frame(samples = 2:8, b.mean = 0, b.sd = 0, c.mean = 0, c.sd = 0)
+
+for (i in master.herit$samples) {
+  
+  daf2notNA.df$index <- rep(sample(1:daf2.numWells, daf2.numWells, replace = FALSE), each = nFiles)
+  daf2notNA.df <- daf2notNA.df[order(daf2notNA.df$index), ]
+  daf16notNA.df$index <- rep(sample(1:daf16.numWells, daf16.numWells, replace = FALSE), each = nFiles)
+  daf16notNA.df <- daf16notNA.df[order(daf16notNA.df$index), ]
+  N2notNA.df$index <- rep(sample(1:N2.numWells, N2.numWells, replace = FALSE), each = nFiles)
+  N2notNA.df <- N2notNA.df[order(N2notNA.df$index), ]
+
+  daf2choose <- daf2.numWells %/% i
+  daf16choose <- daf16.numWells %/% i
+  N2choose <- N2.numWells %/% i
+  
+  daf2grouped.df
+  daf16grouped.df
+  N2grouped.df
+  
+  for (j in 1:daf2choose) {
+    
+  }
+
+  heritabilities <- data.frame(trial = 1:mintochoose, bparam = 0, cparam = 0)
+
+  for (j in 1:mintochoose) {
+    print(paste("Processing iteration ", j, " out of ", mintochoose, ".", sep = ""))
+    daf2index <- sample(daf2sample, i, replace = FALSE)
+    daf16index <- sample(daf16sample, i, replace = FALSE)
+    N2index <- sample(N2sample, i, replace = FALSE)
+  
+    trial1daf2.df <- daf2notNA.df %>% filter(index %in% daf2index)
+    trial1daf16.df <- daf16notNA.df %>% filter(index %in% daf16index)
+    trial1N2.df <- N2notNA.df %>% filter(index %in% N2index)
+    trial1.df <- bind_rows(trial1daf2.df, trial1daf16.df, trial1N2.df)
+
+    well_twos_params.df <- data.frame(strain = rep(unique(strains), each = i), 
+                                    replicate = rep(1:i, length(unique(strains))), 
+                                    bparam = rep(0, length(unique(strains)) * i), 
+                                    cparam = rep(0, length(unique(strains)) * i))
+
+    l = 1
+
+    for (k in daf2index) {
+      temp <- nlm(well_twoplog_sample, c(2, 10), trial1.df, k, "daf-2")[["estimate"]]
+      well_twos_params.df$bparam[l] <- temp[1]
+      well_twos_params.df$cparam[l] <- temp[2]
+      l = l + 1
+    }
+
+    for (k in daf16index) {
+      temp <- nlm(well_twoplog_sample, c(2, 10), trial1.df, k, "daf-16")[["estimate"]]
+      well_twos_params.df$bparam[l] <- temp[1]
+      well_twos_params.df$cparam[l] <- temp[2]
+      l = l + 1
+    }
+
+    for (k in N2index) {
+      temp <- nlm(well_twoplog_sample, c(2, 10), trial1.df, k, "N2")[["estimate"]]
+      well_twos_params.df$bparam[l] <- temp[1]
+      well_twos_params.df$cparam[l] <- temp[2]
+      l = l + 1
+    }
+
+    x <- well_twos_params.df %>% select(c(strain, bparam))
+    x$pheno <- x$bparam
+    x <- x %>% select(c(strain, pheno))
+    heritabilities$bparam[j] <- H2.fun(x)
+
+    x <- well_twos_params.df %>% select(c(strain, cparam))
+    x$pheno <- x$cparam
+    x <- x %>% select(c(strain, pheno))
+    heritabilities$cparam[j] <- H2.fun(x)
+  }
+
+  master.herit$b.mean[i - 1] <- mean(heritabilities$bparam)
+  master.herit$b.sd[i - 1] <- sd(heritabilities$bparam)
+  master.herit$c.mean[i - 1] <- mean(heritabilities$cparam)
+  master.herit$c.sd[i - 1] <- sd(heritabilities$cparam)
+}
+
+ggplot(master.herit) + geom_line(aes(x = samples, y = b.mean, color = "red")) + geom_line(aes(x = samples, y = c.mean, color = "blue")) + geom_errorbar(aes(x = samples, ymax = b.mean + b.sd, ymin = b.mean - b.sd, color = "red")) + geom_errorbar(aes(x = samples, ymax = c.mean + c.sd, ymin = c.mean - c.sd, color = "blue")) + labs( x = "# Replicates", y = "Heritability") + guides(color = FALSE)
+
+```

@@ -18,8 +18,8 @@ well_twoplog <- function(input, df, row, col) {
   sum(((100 / (1 + ((df$day[df$row == row & df$col == col] / input[2]) ^ input[1]))) - df$norm.activity[df$row == row & df$col == col]) ^ 2)
 }
 
-well_twoplog_grouping <- function(input, df, grouping, col) {
-  sum(((100 / (1 + ((df$day[df$grouping == grouping & df$col == col] / input[2]) ^ input[1]))) - df$norm.activity[df$grouping == grouping & df$col == col]) ^ 2)
+well_twoplog_sample <- function(input, df, index, strain) {
+  sum(((100 / (1 + ((df$day[df$index == index & df$strain == strain] / input[2]) ^ input[1]))) - df$norm.activity[df$index == index & df$strain == strain]) ^ 2)
 }
 
 strain_twoplog <- function(input, df, strain) {
