@@ -13,17 +13,17 @@ library("dplyr")
 library("ggplot2")
 library("tidyr")
 
-experiments.file <- dir(path = "./Scripts", "p04", full.names = TRUE)
+experiments.file <- dir(path = "./Scripts", "p05", full.names = TRUE)
 opts_knit$set(root.dir = getwd())
 
 for (i in 1:length(experiments.file)) {
   experimentName <- str_split(str_split(experiments.file[i], "Scripts/")[[1]][2], ".R")[[1]][1]
-  knit2html("./Scripts/Longevity_Report.Rmd", 
-            output = paste("./Results/", experimentName, "_Report.html", sep = ""),
+  knit2html("./Scripts/Longevity_Report_daf_initial.Rmd", 
+            output = paste("./Results/", experimentName, "_Initial_Report.html", sep = ""),
             stylesheet = "./Scripts/foghorn_edited.css")
-  knit2html("./Scripts/Longevity_Report_Adjusted.Rmd", 
-            output = paste("./Results/", experimentName, "_Adjusted_Report.html", sep = ""),
-            stylesheet = "./Scripts/foghorn_edited.css")
+  #knit2html("./Scripts/Longevity_Report_Adjusted.Rmd", 
+   #         output = paste("./Results/", experimentName, "_Adjusted_Report.html", sep = ""),
+    #        stylesheet = "./Scripts/foghorn_edited.css")
 }
 
 ## For testing one experiment ####################################################################

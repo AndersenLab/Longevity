@@ -43,49 +43,13 @@ output:
 
 ## Distribution of Parameters ##
 
+![plot of chunk Parameters](./Data/Processed/p04_3mgmL/p04_3mgmL_Parameters-1.png) ![plot of chunk Parameters](./Data/Processed/p04_3mgmL/p04_3mgmL_Parameters-2.png) ![plot of chunk Parameters](./Data/Processed/p04_3mgmL/p04_3mgmL_Parameters-3.png) 
+
 
 ```
-## Warning: Removed 4 rows containing missing values (geom_point).
+## Error in names(pdata.melted) = c("pheno", "strain"): 'names' attribute [2] must be the same length as the vector [1]
 ```
 
-```
-## Warning: Removed 3 rows containing missing values (geom_point).
-```
+## Heritability of Parameters ##
 
-```
-## Warning: Removed 2 rows containing missing values (geom_point).
-```
-
-```
-## Warning: Removed 6 rows containing missing values (geom_point).
-```
-
-```
-## Warning: Removed 8 rows containing missing values (geom_point).
-```
-
-```
-## Warning: Removed 5 rows containing missing values (geom_point).
-```
-
-```
-## Warning: Removed 1 rows containing missing values (geom_point).
-```
-
-```
-## Warning: Removed 1 rows containing missing values (geom_point).
-```
-
-```
-## Warning: Removed 1 rows containing missing values (geom_point).
-```
-
-```
-## Warning: Removed 1 rows containing missing values (geom_point).
-```
-
-```
-## Warning: Removed 1 rows containing missing values (geom_point).
-```
-
-![plot of chunk Parameters](./Data/Processed/p04_3mgmL/p04_3mgmL_Parameters-1.png) 
+![plot of chunk Heritability](./Data/Processed/p04_3mgmL/p04_3mgmL_Heritability-1.png) 

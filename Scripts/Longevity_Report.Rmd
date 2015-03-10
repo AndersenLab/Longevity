@@ -12,6 +12,7 @@ output:
 
 source("./Scripts/wMT_fxns.R")
 source("./Scripts/survival_fxns.R")
+source("./Scripts/Broad_Sense_Heritability_ECA.R")
 source(paste("./Scripts/", experimentName, ".R", sep = ""))
 
 options(stringsAsFactors = FALSE)
@@ -191,7 +192,7 @@ for (i in 1:nrow(well.df)) {
   }
 }
 
-ggplot(well.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(row ~ col, labeller = label_strains) + ylim(0, 100) + presentation
+ggplot(well.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(row ~ col, labeller = label_strains) + ylim(0, 100) + presentation + guides(color = FALSE)
 
 ```
 
@@ -253,7 +254,7 @@ for (i in 1:nrow(well_twos.df)) {
   }
 }
 
-ggplot(well_twos.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation
+ggplot(well_twos.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + guides(color = FALSE)
 
 ```
 
@@ -313,7 +314,7 @@ for (i in 1:nrow(well_threes.df)) {
   }
 }
 
-ggplot(well_threes.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation
+ggplot(well_threes.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + guides(color = FALSE)
 
 ```
 
@@ -373,7 +374,7 @@ for (i in 1:nrow(well_fours.df)) {
   }
 }
 
-ggplot(well_fours.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation
+ggplot(well_fours.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + guides(color = FALSE)
 
 ```
 
@@ -427,7 +428,7 @@ for (i in 1:nrow(strain.df)) {
   }
 }
 
-ggplot(strain.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ strain) + ylim(0, 100) + presentation
+ggplot(strain.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ strain) + ylim(0, 100) + presentation + guides(color = FALSE)
 
 ```
 
@@ -448,5 +449,37 @@ for (i in 1:nrow(params.df)) {
 }
 
 ggplot(params.df) + aes(x = bparam, y = cparam, size = grouping, color = grouping) + geom_point(alpha = 0.5) + facet_wrap( ~ strain) + ylim(0, 25) + xlim(0, 4) + presentation
+
+params.df %>% filter(grouping == "fours") %>% ggplot(.) + aes(x = strain, y = bparam) + geom_boxplot() + geom_jitter() + presentation + ylim(0, NA)
+
+params.df %>% filter(grouping == "fours") %>% ggplot(.) + aes(x = strain, y = cparam) + geom_boxplot() + geom_jitter() + presentation + ylim(0, NA)
+
+```
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+heritabilities <- data.frame(parameter = rep(c("bparam", "cparam"), length(unique(params.df$grouping))), grouping = rep(unique(params.df$grouping), each = 2), herit = rep(0, length(unique(params.df$grouping)) * 2))
+
+for (i in (1:length(unique(params.df$grouping))) * 2) {
+  x <- params.df %>% filter(grouping == levels(params.df$grouping)[i / 2]) %>% select(c(strain, bparam))
+  x$pheno <- x$bparam
+  x <- x %>% select(c(strain, pheno))
+  heritabilities$herit[i - 1] <- H2.fun(x)
+
+  x <- params.df %>% filter(grouping == levels(params.df$grouping)[i / 2]) %>% select(c(strain, cparam))
+  x$pheno <- x$cparam
+  x <- x %>% select(c(strain, pheno))
+  heritabilities$herit[i] <- H2.fun(x)
+}
+
+save(heritabilities, file = paste(processedDataPath, "/", experimentName, "_herit.Rda", sep = ""))
+
+```
+
+## Heritability of Parameters ##
+
+```{r Heritability, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+ggplot(heritabilities) + aes(x = factor(parameter), y = herit, color = grouping, size = 6) + geom_point() + labs(x = "Parameter", y = "Heritability") + ylim(0, 1) + presentation + guides(size = FALSE)
 
 ```

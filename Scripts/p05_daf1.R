@@ -6,6 +6,6 @@ uniqueStrains <- c("N2-1", "daf-2-1", "daf-2-2", "N2-2", "daf-16-1", "daf-16-2",
 rows <- c("A", "B", "C", "D", "E", "F", "G", "H")
 nStrains <- length(strains)
 colRemove <- c()
-wellRemove <- data.frame(col = c(3), row = c("H"))
+wellRemove <- data.frame(col = c(3, 9, 12), row = c("H", "E", "B"))
 
 nums <- scan("./Scripts/daf1_count.txt", sep = " ")

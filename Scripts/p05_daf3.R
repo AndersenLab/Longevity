@@ -7,6 +7,6 @@ rows <- c("A", "B", "C", "D", "E", "F", "G", "H")
 nStrains <- length(strains)
 colRemove <- c()
 wellRemove <- data.frame(col = c(1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 10, 10, 10, 11, 12),
-                         row = c("B", "F", "G", "F", "E", "B", "A", "A", "B", "C", "E", "F", "G", "H", "D", "B", "C", "D", "F", "F", "D", "C", "B", "F", "G", "H", "H", "G", "E", "D", "A", "A", "B", "D", "F", "H", "F", "E", "C", "B", "B"))
+                         row = c("B", "F", "A", "B", "E", "F", "G", "A", "B", "C", "E", "F", "G", "B", "D", "H", "C", "D", "F", "B", "C", "D", "F", "F", "G", "H", "A", "D", "E", "G", "H", "A", "B", "D", "F", "H", "C", "E", "F", "B", "B"))
 
 nums <- scan("./Scripts/daf3_count.txt", sep = " ")
