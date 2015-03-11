@@ -14,38 +14,12 @@ output:
 ```
 
 
-```
-## Error in `$<-.data.frame`(`*tmp*`, "day", value = c(1, 1, 1, 1, 1, 1, : replacement has 8160 rows, data has 1632
-```
-
-```
-## Error in order(raw.df$col, raw.df$row, raw.df$day): argument 3 is not a vector
-```
-
-```
-## Error in `$<-.data.frame`(`*tmp*`, "strain", value = c("daf-2", "daf-2", : replacement has 8160 rows, data has 7680
-```
-
-```
-## Error in `$<-.data.frame`(`*tmp*`, "uniqueStrain", value = c("daf-2-1", : replacement has 8160 rows, data has 7680
-```
-
-```
-## Error in `$<-.data.frame`(`*tmp*`, "num", value = c(5, 5, 5, 5, 5, 5, : replacement has 8160 rows, data has 7680
-```
 
 
 
 
 
 
-```
-## Error in `$<-.data.frame`(`*tmp*`, "strain", value = c("daf-2", "daf-2", : replacement has 1632 rows, data has 1536
-```
-
-```
-## Error in `$<-.data.frame`(`*tmp*`, "uniqueStrain", value = c("daf-2-1", : replacement has 1632 rows, data has 1536
-```
 
 ## Individual Well Fits ##
 
@@ -53,62 +27,21 @@ output:
 
 ## Two Wells Fits ##
 
-
-```
-## Error in `$<-.data.frame`(`*tmp*`, "grouping", value = c(1L, 1L, 1L, 1L, : replacement has 1632 rows, data has 1536
-```
-
-```
-## Error in eval(expr, envir, enclos): unknown column 'strain'
-```
-
 ![plot of chunk Pair_Fits](./Data/Processed/p05_daf3/p05_daf3_Pair_Fits-1.png) 
 
 ## Three Wells Fits ##
-
-
-```
-## Error in `$<-.data.frame`(`*tmp*`, "grouping", value = c(1, 1, 1, 1, 1, : replacement has 1632 rows, data has 1536
-```
-
-```
-## Error in eval(expr, envir, enclos): unknown column 'strain'
-```
 
 ![plot of chunk Threes_Fits](./Data/Processed/p05_daf3/p05_daf3_Threes_Fits-1.png) 
 
 ## Four Wells Fits ##
 
-
-```
-## Error in `$<-.data.frame`(`*tmp*`, "grouping", value = c(1L, 1L, 1L, 1L, : replacement has 1632 rows, data has 1536
-```
-
-```
-## Error in eval(expr, envir, enclos): unknown column 'strain'
-```
-
 ![plot of chunk Fours_Fits](./Data/Processed/p05_daf3/p05_daf3_Fours_Fits-1.png) 
 
 ## Eight Wells Fits ##
 
-
-```
-## Error in `$<-.data.frame`(`*tmp*`, "grouping", value = c(1, 1, 1, 1, 1, : replacement has 1632 rows, data has 1536
-```
-
-```
-## Error in eval(expr, envir, enclos): unknown column 'strain'
-```
-
 ![plot of chunk Eights_Fits](./Data/Processed/p05_daf3/p05_daf3_Eights_Fits-1.png) 
 
 ## Strain Fits ##
-
-
-```
-## Error in eval(expr, envir, enclos): unknown column 'strain'
-```
 
 ![plot of chunk Strain_Fits](./Data/Processed/p05_daf3/p05_daf3_Strain_Fits-1.png) 
 
