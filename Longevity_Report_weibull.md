@@ -53,8 +53,3 @@ output:
 ## Heritability of Parameters ##
 
 ![plot of chunk Heritability](./Data/Processed/p04_3mgmL/p04_3mgmL_Heritability-1.png) 
-
-## Quantifying Curve Fits ##
-
-![plot of chunk Minimum](./Data/Processed/p04_3mgmL/p04_3mgmL_Minimum-1.png) 
-

@@ -215,7 +215,7 @@ for (i in 1:nrow(well_twos.df)) {
   if (!is.finite(well_twos.df$norm.activity[i])) well_twos.df$norm.activity[i] <- NA
 }
 
-well_twos_params.df <- data.frame(strain = rep(strains, each = 4), col = rep(1:12, each = 4), grouping = rep(1:4, nStrains), bparam = rep(0, nStrains * 4), cparam = rep(0, nStrains * 4))
+well_twos_params.df <- data.frame(strain = rep(strains, each = 4), col = rep(1:12, each = 4), grouping = rep(1:4, nStrains), Aparam = rep(0, nStrains * 4), Gparam = rep(0, nStrains * 4))
 
 l = 1
 
@@ -275,7 +275,7 @@ for (i in 1:nrow(well_threes.df)) {
   if (!is.finite(well_threes.df$norm.activity[i])) well_threes.df$norm.activity[i] <- NA
 }
 
-well_threes_params.df <- data.frame(strain = rep(strains, each = 3), col = rep(1:12, each = 3), grouping = rep(1:3, nStrains), bparam = rep(0, nStrains * 3), cparam = rep(0, nStrains * 3))
+well_threes_params.df <- data.frame(strain = rep(strains, each = 3), col = rep(1:12, each = 3), grouping = rep(1:3, nStrains), Aparam = rep(0, nStrains * 3), Gparam = rep(0, nStrains * 3))
 
 l = 1
 
@@ -356,7 +356,7 @@ l <- 2
 
 for (x in 1:12) {
   for (y in 1:2) {
-    well_fours_survivals.df[l] <- draw_twoplog(well_fours_params.df$Aparam[well_fours_params.df$col == x & well_fours_params.df$grouping == y], well_fours_params.df$Gparam[well_fours_params.df$col == x & well_fours_params.df$grouping == y])
+    well_fours_survivals.df[l] <- draw_gompertz(well_fours_params.df$Aparam[well_fours_params.df$col == x & well_fours_params.df$grouping == y], well_fours_params.df$Gparam[well_fours_params.df$col == x & well_fours_params.df$grouping == y])
     l <- l + 1
   }
 }

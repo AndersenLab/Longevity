@@ -153,16 +153,17 @@ well.df <- well.df %>%
   mutate(norm.activity = 100 * activity / max(activity, na.rm = TRUE))
 well.df <- ungroup(well.df)
 
-well_params.df <- data.frame(strain = rep(strains, each = length(rows)), col = rep(1:12, each = length(rows)), row = rep(rows, nStrains), bparam = rep(0, nStrains * replicates), cparam = rep(0, nStrains * replicates))
+well_params.df <- data.frame(strain = rep(strains, each = length(rows)), col = rep(1:12, each = length(rows)), row = rep(rows, nStrains), bparam = 0, cparam = 0, minimum = 0)
 
 l = 1
 
 for (x in 1:12) {
   for (y in rows) {
     if (!(is.na(well.df$norm.activity[well.df$row == y & well.df$col == x]))[1] == TRUE) {
-      temp <- nlm(well_twoplog, c(2, 10), well.df, y, x)[["estimate"]]
-      well_params.df$bparam[l] <- temp[1]
-      well_params.df$cparam[l] <- temp[2]
+      temp <- nlm(well_twoplog, c(2, 10), well.df, y, x)
+      well_params.df$bparam[l] <- temp[["estimate"]][1]
+      well_params.df$cparam[l] <- temp[["estimate"]][2]
+      well_params.df$minimum[l] <- temp[["minimum"]][1]
     }
     l = l + 1
   }
@@ -215,16 +216,17 @@ for (i in 1:nrow(well_twos.df)) {
   if (!is.finite(well_twos.df$norm.activity[i])) well_twos.df$norm.activity[i] <- NA
 }
 
-well_twos_params.df <- data.frame(strain = rep(strains, each = 4), col = rep(1:12, each = 4), grouping = rep(1:4, nStrains), bparam = rep(0, nStrains * 4), cparam = rep(0, nStrains * 4))
+well_twos_params.df <- data.frame(strain = rep(strains, each = 4), col = rep(1:12, each = 4), grouping = rep(1:4, nStrains), bparam = 0, cparam = 0, minimum = 0)
 
 l = 1
 
 for (x in 1:12) {
   for (y in 1:4) {
     if (!(is.na(well_twos.df$norm.activity[well_twos.df$grouping == y & well_twos.df$col == x]))[1] == TRUE) {
-      temp <- nlm(well_twoplog_grouping, c(2, 10), well_twos.df, y, x)[["estimate"]]
-      well_twos_params.df$bparam[l] <- temp[1]
-      well_twos_params.df$cparam[l] <- temp[2]
+      temp <- nlm(well_twoplog_grouping, c(2, 10), well_twos.df, y, x)
+      well_twos_params.df$bparam[l] <- temp[["estimate"]][1]
+      well_twos_params.df$cparam[l] <- temp[["estimate"]][2]
+      well_twos_params.df$minimum[l] <- temp[["minimum"]][1]
     }
     l = l + 1
   }
@@ -275,16 +277,17 @@ for (i in 1:nrow(well_threes.df)) {
   if (!is.finite(well_threes.df$norm.activity[i])) well_threes.df$norm.activity[i] <- NA
 }
 
-well_threes_params.df <- data.frame(strain = rep(strains, each = 3), col = rep(1:12, each = 3), grouping = rep(1:3, nStrains), bparam = rep(0, nStrains * 3), cparam = rep(0, nStrains * 3))
+well_threes_params.df <- data.frame(strain = rep(strains, each = 3), col = rep(1:12, each = 3), grouping = rep(1:3, nStrains), bparam = 0, cparam = 0, minimum = 0)
 
 l = 1
 
 for (x in 1:12) {
   for (y in 1:3) {
     if (!(is.na(well_threes.df$norm.activity[well_threes.df$grouping == y & well_threes.df$col == x]))[1] == TRUE) {
-      temp <- nlm(well_twoplog_grouping, c(2, 10), well_threes.df, y, x)[["estimate"]]
-      well_threes_params.df$bparam[l] <- temp[1]
-      well_threes_params.df$cparam[l] <- temp[2]
+      temp <- nlm(well_twoplog_grouping, c(2, 10), well_threes.df, y, x)
+      well_threes_params.df$bparam[l] <- temp[["estimate"]][1]
+      well_threes_params.df$cparam[l] <- temp[["estimate"]][2]
+      well_threes_params.df$minimum[l] <- temp[["minimum"]][1]
     }
     l = l + 1
   }
@@ -335,16 +338,17 @@ for (i in 1:nrow(well_fours.df)) {
   if (!is.finite(well_fours.df$norm.activity[i])) well_fours.df$norm.activity[i] <- NA
 }
 
-well_fours_params.df <- data.frame(strain = rep(strains, each = 2), col = rep(1:12, each = 2), grouping = rep(1:2, nStrains), bparam = rep(0, nStrains * 2), cparam = rep(0, nStrains * 2))
+well_fours_params.df <- data.frame(strain = rep(strains, each = 2), col = rep(1:12, each = 2), grouping = rep(1:2, nStrains), bparam = 0, cparam = 0, minimum = 0)
 
 l = 1
 
 for (x in 1:12) {
   for (y in 1:2) {
     if (!(is.na(well_fours.df$norm.activity[well_fours.df$grouping == y & well_fours.df$col == x]))[1] == TRUE) {
-      temp <- nlm(well_twoplog_grouping, c(2, 10), well_fours.df, y, x)[["estimate"]]
-      well_fours_params.df$bparam[l] <- temp[1]
-      well_fours_params.df$cparam[l] <- temp[2]
+      temp <- nlm(well_twoplog_grouping, c(2, 10), well_fours.df, y, x)
+      well_fours_params.df$bparam[l] <- temp[["estimate"]][1]
+      well_fours_params.df$cparam[l] <- temp[["estimate"]][2]
+      well_fours_params.df$minimum[l] <- temp[["minimum"]][1]
     }
     l = l + 1
   }
@@ -393,15 +397,16 @@ for (i in 1:nrow(strain.df)) {
   if (!is.finite(strain.df$norm.activity[i])) strain.df$norm.activity[i] <- NA
 }
 
-strain_params.df <- data.frame(strain = unique(strains), bparam = rep(0, length(unique(strains))), cparam = rep(0, length(unique(strains))))
+strain_params.df <- data.frame(strain = unique(strains), bparam = 0, cparam = 0, minimum = 0)
 
 l = 1
 
 for (x in unique(strains)) {
   if (!(is.na(strain.df$norm.activity[strain.df$strain == x]))[1] == TRUE) {
-    temp <- nlm(strain_twoplog, c(2, 10), strain.df, x)[["estimate"]]
-    strain_params.df$bparam[l] <- temp[1]
-    strain_params.df$cparam[l] <- temp[2]
+    temp <- nlm(strain_twoplog, c(2, 10), strain.df, x)
+    strain_params.df$bparam[l] <- temp[["estimate"]][1]
+    strain_params.df$cparam[l] <- temp[["estimate"]][2]
+    strain_params.df$minimum[l] <- temp[["minimum"]][1]
   }
   l = l + 1
 }
@@ -438,9 +443,10 @@ params.df$grouping <- c(rep("well", nrow(well_params.df)), rep("twos", nrow(well
 params.df$grouping <- ordered(params.df$grouping, levels = c("well", "twos", "threes", "fours", "strain"))
 
 for (i in 1:nrow(params.df)) {
-  if (params.df$bparam[i] == 0 & params.df$cparam[i] == 0) {
+  if (params.df$bparam[i] == 0 & params.df$cparam[i] == 0 & params.df$minimum[i] == 0) {
     params.df$bparam[i] <- NA
     params.df$cparam[i] <- NA
+    params.df$minimum[i] <- NA
   }
 }
 
@@ -481,3 +487,15 @@ plotting.df <- heritabilities %>% filter(as.numeric(grouping) < 5)
 ggplot(plotting.df) + aes(x = as.numeric(grouping), y = herit, color = parameter, size = 2) + geom_line() + labs(x = "Number of Wells Grouped", y = "Heritability") + ylim(0, 1) + presentation + remove.legend + rotate.y.axis
 
 ```
+
+## Quantifying Curve Fits ##
+
+```{r Minimum, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+minimum.df <- params.df %>% group_by(grouping) %>% summarize(minimum.avg = mean(minimum, na.rm = TRUE))
+minimum.df$grouping <- c(1, 2, 3, 4, 8)
+
+ggplot(minimum.df) + aes(x = grouping, y = minimum.avg, size = 2) + geom_line() + labs(x = "Number of Wells Grouped", y = "Average Least Squares Deviation") + presentation + remove.legend + rotate.y.axis
+
+```
+
