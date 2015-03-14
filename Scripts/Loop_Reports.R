@@ -26,6 +26,23 @@ for (i in 1:length(experiments.file)) {
     #        stylesheet = "./Scripts/foghorn_edited.css")
 }
 
+experiments.file <- dir(path = "./Scripts", "p04", full.names = TRUE)
+for (i in 1:length(experiments.file)) {
+  experimentName <- str_split(str_split(experiments.file[i], "Scripts/")[[1]][2], ".R")[[1]][1]
+  knit2html("./Scripts/Longevity_Report_gompertz.Rmd", 
+            output = paste("./Results/", experimentName, "_Gompertz_Report.html", sep = ""),
+            stylesheet = "./Scripts/foghorn_edited.css")
+  knit2html("./Scripts/Longevity_Report_weibull.Rmd", 
+            output = paste("./Results/", experimentName, "_Weibull_Report.html", sep = ""),
+            stylesheet = "./Scripts/foghorn_edited.css")
+  knit2html("./Scripts/Longevity_Report.Rmd", 
+            output = paste("./Results/", experimentName, "_TwoPLog_Report.html", sep = ""),
+            stylesheet = "./Scripts/foghorn_edited.css")
+  knit2html("./Scripts/Longevity_Report_threeplog.Rmd", 
+            output = paste("./Results/", experimentName, "_ThreePLog_Report.html", sep = ""),
+            stylesheet = "./Scripts/foghorn_edited.css")
+}
+
 ## For testing one experiment ####################################################################
 
 experiments.file <- dir(path = "./Scripts", "p04", full.names = TRUE)

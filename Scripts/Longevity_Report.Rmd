@@ -160,7 +160,7 @@ l = 1
 for (x in 1:12) {
   for (y in rows) {
     if (!(is.na(well.df$norm.activity[well.df$row == y & well.df$col == x]))[1] == TRUE) {
-      temp <- nlm(well_twoplog, c(2, 1), well.df, y, x)[["estimate"]]
+      temp <- nlm(well_twoplog, c(2, 10), well.df, y, x)[["estimate"]]
       well_params.df$bparam[l] <- temp[1]
       well_params.df$cparam[l] <- temp[2]
     }
@@ -222,7 +222,7 @@ l = 1
 for (x in 1:12) {
   for (y in 1:4) {
     if (!(is.na(well_twos.df$norm.activity[well_twos.df$grouping == y & well_twos.df$col == x]))[1] == TRUE) {
-      temp <- nlm(well_twoplog_grouping, c(2, 1), well_twos.df, y, x)[["estimate"]]
+      temp <- nlm(well_twoplog_grouping, c(2, 10), well_twos.df, y, x)[["estimate"]]
       well_twos_params.df$bparam[l] <- temp[1]
       well_twos_params.df$cparam[l] <- temp[2]
     }
@@ -282,7 +282,7 @@ l = 1
 for (x in 1:12) {
   for (y in 1:3) {
     if (!(is.na(well_threes.df$norm.activity[well_threes.df$grouping == y & well_threes.df$col == x]))[1] == TRUE) {
-      temp <- nlm(well_twoplog_grouping, c(2, 1), well_threes.df, y, x)[["estimate"]]
+      temp <- nlm(well_twoplog_grouping, c(2, 10), well_threes.df, y, x)[["estimate"]]
       well_threes_params.df$bparam[l] <- temp[1]
       well_threes_params.df$cparam[l] <- temp[2]
     }
@@ -342,7 +342,7 @@ l = 1
 for (x in 1:12) {
   for (y in 1:2) {
     if (!(is.na(well_fours.df$norm.activity[well_fours.df$grouping == y & well_fours.df$col == x]))[1] == TRUE) {
-      temp <- nlm(well_twoplog_grouping, c(2, 1), well_fours.df, y, x)[["estimate"]]
+      temp <- nlm(well_twoplog_grouping, c(2, 10), well_fours.df, y, x)[["estimate"]]
       well_fours_params.df$bparam[l] <- temp[1]
       well_fours_params.df$cparam[l] <- temp[2]
     }
@@ -399,7 +399,7 @@ l = 1
 
 for (x in unique(strains)) {
   if (!(is.na(strain.df$norm.activity[strain.df$strain == x]))[1] == TRUE) {
-    temp <- nlm(strain_twoplog, c(2, 1), strain.df, x)[["estimate"]]
+    temp <- nlm(strain_twoplog, c(2, 10), strain.df, x)[["estimate"]]
     strain_params.df$bparam[l] <- temp[1]
     strain_params.df$cparam[l] <- temp[2]
   }
@@ -424,7 +424,7 @@ for (i in 1:nrow(strain.df)) {
   }
 }
 
-ggplot(strain.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red"), size = 2, alpha = 0.8) + facet_wrap( ~ strain) + ylim(0, 100) + presentation + + remove.legend + rotate.y.axis + labs(x = "Day", y = "Normalized Activity")
+ggplot(strain.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red"), size = 2, alpha = 0.8) + facet_wrap( ~ strain) + ylim(0, 100) + presentation + remove.legend + rotate.y.axis + labs(x = "Day", y = "Normalized Activity")
 
 ```
 
