@@ -191,7 +191,7 @@ for (i in 1:nrow(well.df)) {
   }
 }
 
-ggplot(well.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(row ~ col, labeller = label_strains) + ylim(0, 100) + presentation + guides(color = FALSE)
+ggplot(well.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(row ~ col, labeller = label_strains) + ylim(0, 100) + presentation + remove.legend
 
 ```
 
@@ -253,7 +253,7 @@ for (i in 1:nrow(well_twos.df)) {
   }
 }
 
-ggplot(well_twos.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + guides(color = FALSE)
+ggplot(well_twos.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + remove.legend
 
 ```
 
@@ -313,7 +313,7 @@ for (i in 1:nrow(well_threes.df)) {
   }
 }
 
-ggplot(well_threes.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + guides(color = FALSE)
+ggplot(well_threes.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + remove.legend
 
 ```
 
@@ -373,7 +373,7 @@ for (i in 1:nrow(well_fours.df)) {
   }
 }
 
-ggplot(well_fours.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + guides(color = FALSE)
+ggplot(well_fours.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + remove.legend
 
 ```
 
@@ -433,7 +433,7 @@ for (i in 1:nrow(well_eights.df)) {
   }
 }
 
-ggplot(well_eights.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ uniqueStrain) + ylim(0, 100) + presentation + guides(color = FALSE)
+ggplot(well_eights.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ uniqueStrain) + ylim(0, 100) + presentation + remove.legend
 
 ```
 
@@ -487,7 +487,7 @@ for (i in 1:nrow(strain.df)) {
   }
 }
 
-ggplot(strain.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ strain) + ylim(0, 100) + presentation + guides(color = FALSE)
+ggplot(strain.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ strain) + ylim(0, 100) + presentation + remove.legend
 
 ```
 
@@ -507,7 +507,7 @@ for (i in 1:nrow(params.df)) {
   }
 }
 
-ggplot(params.df) + aes(x = bparam, y = cparam, size = grouping, color = grouping) + geom_point(alpha = 0.5) + facet_wrap( ~ strain) + ylim(0, 25) + xlim(0, 4) + presentation
+ggplot(params.df) + aes(x = bparam, y = cparam, size = grouping, color = grouping) + geom_point(alpha = 0.5) + facet_wrap( ~ strain) + ylim(0, 25) + xlim(0, 4) + presentation + big.legend
 
 params.df %>% filter(grouping == "well") %>% ggplot(.) + aes(x = strain, y = bparam) + geom_boxplot() + geom_jitter() + presentation + ylim(0, 3)
 

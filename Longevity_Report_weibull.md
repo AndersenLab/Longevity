@@ -10,7 +10,7 @@ output:
 
 
 ```
-## [1] "p04_3mgmL"
+## [1] "p05_daf3"
 ```
 
 
@@ -23,27 +23,27 @@ output:
 
 ## Individual Well Fits ##
 
-![plot of chunk Well_Fits](./Data/Processed/p04_3mgmL/p04_3mgmL_Well_Fits-1.png) 
+![plot of chunk Well_Fits](./Data/Processed/p05_daf3/p05_daf3_Weibull_Well_Fits-1.png) 
 
 ## Two Wells Fits ##
 
-![plot of chunk Pair_Fits](./Data/Processed/p04_3mgmL/p04_3mgmL_Pair_Fits-1.png) 
+![plot of chunk Pair_Fits](./Data/Processed/p05_daf3/p05_daf3_Weibull_Pair_Fits-1.png) 
 
 ## Three Wells Fits ##
 
-![plot of chunk Threes_Fits](./Data/Processed/p04_3mgmL/p04_3mgmL_Threes_Fits-1.png) 
+![plot of chunk Threes_Fits](./Data/Processed/p05_daf3/p05_daf3_Weibull_Threes_Fits-1.png) 
 
 ## Four Wells Fits ##
 
-![plot of chunk Fours_Fits](./Data/Processed/p04_3mgmL/p04_3mgmL_Fours_Fits-1.png) 
+![plot of chunk Fours_Fits](./Data/Processed/p05_daf3/p05_daf3_Weibull_Fours_Fits-1.png) 
 
 ## Strain Fits ##
 
-![plot of chunk Strain_Fits](./Data/Processed/p04_3mgmL/p04_3mgmL_Strain_Fits-1.png) 
+![plot of chunk Strain_Fits](./Data/Processed/p05_daf3/p05_daf3_Weibull_Strain_Fits-1.png) 
 
 ## Distribution of Parameters ##
 
-![plot of chunk Parameters](./Data/Processed/p04_3mgmL/p04_3mgmL_Parameters-1.png) 
+![plot of chunk Parameters](./Data/Processed/p05_daf3/p05_daf3_Weibull_Parameters-1.png) 
 
 
 ```
@@ -52,4 +52,8 @@ output:
 
 ## Heritability of Parameters ##
 
-![plot of chunk Heritability](./Data/Processed/p04_3mgmL/p04_3mgmL_Heritability-1.png) 
+![plot of chunk Heritability](./Data/Processed/p05_daf3/p05_daf3_Weibull_Heritability-1.png) 
+
+## Quantifying Curve Fits ##
+
+![plot of chunk Minimum](./Data/Processed/p05_daf3/p05_daf3_Weibull_Minimum-1.png) 

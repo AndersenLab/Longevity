@@ -1,0 +1,598 @@
+---
+title: "Analysis of Longevity"
+author: "Ryan Abdella"
+date: "January 15, 2015"
+output:
+  html_document:
+    css: ~/Github/Food-Optimization/Scripts/foghorn_edited.css
+---
+
+
+```{r Setup, warning = FALSE, message = FALSE, echo = FALSE}
+
+source("./Scripts/wMT_fxns.R")
+source("./Scripts/survival_fxns.R")
+source(paste("./Scripts/", experimentName, ".R", sep = ""))
+
+options(stringsAsFactors = FALSE)
+processedDataPath <- paste("./Data/Processed/", experimentName, sep = "")
+saveDataLocation <- paste(processedDataPath, "/", experimentName, sep = "")
+
+paste(experimentName)
+
+```
+
+```{r, warning = FALSE, echo = FALSE}
+
+## Pull in all the files associated with the current experiment  ##
+## and create a data frame containing all the raw data.          ##
+## Regroup data frame so that it's ordered by strain, replicate, ##
+## and day. Add in strain information.                           ##
+
+files <- dir(path = paste("./Data/Raw/", experimentName, sep = ""), 
+             pattern = ".txt", 
+             full.names = TRUE)
+
+nFiles <- length(files)
+
+fileAttributes.df <- data.frame(binSize = vector(length = nFiles),
+                                time = vector(length = nFiles),
+                                numGroups = vector(length = nFiles),
+                                numBins = vector(length = nFiles))
+
+## Stores the attributes for each experiment. ##
+
+inputList <- list()
+for (i in 1:nFiles) {
+  inputList[[i]] <- processMicrotrackerReport(files[i])
+  fileAttributes.df$binSize[i] = inputList[[i]]$binSize[1]
+  fileAttributes.df$time[i] = inputList[[i]]$time[1]
+  fileAttributes.df$numGroups[i] = inputList[[i]]$numGroups[1]
+  fileAttributes.df$numBins[i] = inputList[[i]]$numBins[1]
+}
+
+## Provide summary about the number of distinct parameters for the experiment.  ##
+## Checks to make sure that all wMicrotracker report files have the same bin    ##
+## size and number of groups. This will provide a message if the markdown fails ##
+## due to inconsistencies of either variable.                                   ##
+
+experimentAttributes.df <- fileAttributes.df %>% summarise_each(funs(n_distinct))
+
+if (experimentAttributes.df$binSize != 1 || experimentAttributes.df$numGroups != 1) {
+  message("Not all wMicrotracker files have the same bin size or number of groups.")
+}
+
+## Need to figure out what the minimum number of bins is so that we can truncate ##
+## files that have more bins than that.                                          ##
+
+minBins <- inputList[[1]]$numBins[1]
+
+for (i in 2:length(inputList)) {
+  minBins <- min(minBins, inputList[[i]]$numBins)
+}
+
+## Now we need to generate a single data frame containing the data from all the ##
+## files for the experiment. We also filter the data so that each day has the   ##
+## same length of data collection.                                              ##
+
+raw.df <- ldply(inputList, generateDataFrameFromFile) %>% 
+  filter(time <= minBins * fileAttributes.df$binSize[1])
+raw.df$day <- rep(pullDateInformation(files), each = nStrains * replicates * minBins)
+
+save(raw.df, file = paste(processedDataPath, "/", experimentName, "_Raw.Rda", sep = ""), ascii = TRUE)
+
+## Let's reorganize the data frame so that all the data for a given well is ##
+## consecutive and add in strain information which is pulled from the       ##
+## experiment configuration file.                                           ##
+
+ordered.df <- raw.df[order(raw.df$col, raw.df$row, raw.df$day), ]
+ordered.df$strain <- rep(strains, each = nFiles * replicates * minBins)
+ordered.df$uniqueStrain <- rep(uniqueStrains, each = nFiles * replicates * minBins)
+ordered.df$num <- rep(nums, each = minBins * nFiles)
+ordered.df <- ordered.df %>%
+  mutate(norm.activity = activity / num)
+
+save(ordered.df, file = paste(processedDataPath, "/", experimentName, "_Processed.Rda", sep = ""), ascii = TRUE)
+
+```
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+label_strains <- function(variable, value) {
+  if (variable == "col") {
+    return(strains[value])
+  } else {
+    return(value)
+  }
+}
+
+draw_twoplog <- function(bparam, cparam) {
+  return((100 / (1 + ((times / cparam) ^ bparam))))
+}
+
+```
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+## Remove both columns and individual wells that were contaminated. ##
+## This information is specified in the experiment configuration    ##
+## file. Need to add the ability to remove only after a certain     ##
+## day.                                                             ##
+
+cleaned.df <- ordered.df
+cleaned.df$norm.activity[(ordered.df$col %in% colRemove)] <- NA
+for(i in 1:nrow(wellRemove)) {
+  cleaned.df$norm.activity[cleaned.df$row == wellRemove$row[i] & cleaned.df$col == wellRemove$col[i]] <- NA
+}
+
+save(cleaned.df, file = paste(processedDataPath, "/", experimentName, "_Cleaned.Rda", sep = ""), ascii = TRUE)
+
+```
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+## Let's combine all the time points on a given day into one data ##
+## point and perform some statistical analyses on those values.   ##
+## This will allow us to determine which, if any, of these values ##
+## are the most heritable.                                        ##
+
+well.df <- cleaned.df %>%
+  group_by(col, row, day) %>%
+  summarize(activity = sum(norm.activity))
+
+well.df <- ungroup(well.df)
+well.df$strain <- rep(strains, each = replicates * nFiles)
+well.df$uniqueStrain <- rep(uniqueStrains, each = replicates * nFiles)
+times <- unique(well.df$day)
+
+```
+
+## Individual Well Fits ##
+
+```{r Well_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+well.df <- well.df %>%
+  group_by(col, row) %>%
+  mutate(norm.activity = 100 * activity / max(activity, na.rm = TRUE))
+well.df <- ungroup(well.df)
+
+well.df <- well.df %>%
+  group_by(col, row) %>%
+  mutate(activity50 = day[which(norm.activity <= 50)[1]])
+
+well.df <- well.df %>%
+  group_by(col, row) %>%
+  mutate(activity10 = day[which(norm.activity <= 10)[1]])
+well.df <- ungroup(well.df)
+
+for (i in 1:nrow(well.df)) {
+  if (is.na(well.df$activity0[i]) == TRUE & !(is.na(well.df$norm.activity[i])) == TRUE) {
+    well.df$activity0[i] <- 25
+  }
+}
+
+activity50 <- well.df %>%
+  select(strain, activity50)
+
+activity10 <- well.df %>%
+  select(strain, activity10)
+
+activity0 <- well.df %>%
+  select(strain, activity0)
+
+activity50$pheno <- activity50$activity50
+x <- activity50 %>% select(c(strain, pheno))
+H2.fun(x)
+
+activity10$pheno <- activity10$activity10
+x <- activity10 %>% select(c(strain, pheno))
+H2.fun(x)
+
+activity0$pheno <- activity0$activity0
+x <- activity0 %>% select(c(strain, pheno))
+H2.fun(x)
+
+well_params.df <- data.frame(strain = rep(strains, each = length(rows)), col = rep(1:12, each = length(rows)), row = rep(rows, nStrains), bparam = rep(0, nStrains * replicates), cparam = rep(0, nStrains * replicates))
+
+l = 1
+
+for (x in 1:12) {
+  for (y in rows) {
+    if (!(is.na(well.df$norm.activity[well.df$row == y & well.df$col == x]))[1] == TRUE) {
+      temp <- nlm(well_twoplog, c(2, 10), well.df, y, x)[["estimate"]]
+      well_params.df$bparam[l] <- temp[1]
+      well_params.df$cparam[l] <- temp[2]
+    }
+    l = l + 1
+  }
+}
+
+well_survivals.df <- data.frame(day = times)
+
+l <- 2
+
+for (x in 1:12) {
+  for (y in rows) {
+    well_survivals.df[l] <- draw_twoplog(well_params.df$bparam[well_params.df$col == x & well_params.df$row == y], well_params.df$cparam[well_params.df$col == x & well_params.df$row == y])
+    l <- l + 1
+  }
+}
+
+well_survivals.df <- well_survivals.df %>% gather(strain, yvalue, 2:97)
+well.df$yvalue <- well_survivals.df$yvalue
+
+for (i in 1:nrow(well.df)) {
+  if (is.na(well.df$norm.activity[i]) == TRUE) {
+    well.df$yvalue[i] <- NA
+  }
+}
+
+ggplot(well.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(row ~ col, labeller = label_strains) + ylim(0, 100) + presentation + guides(color = FALSE)
+
+```
+
+## Two Wells Fits ##
+
+```{r Pair_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+## Let's group the wells into pairs and perform curve fitting. ##
+
+well.df$grouping <- rep(rep(1:4, each = nFiles * 2), 12)
+
+well_twos.df <- well.df %>%
+  group_by(col, strain, uniqueStrain, grouping, day) %>%
+  summarise(activity = mean(activity, na.rm = TRUE))
+well_twos.df <- ungroup(well_twos.df)
+
+well_twos.df <- well_twos.df %>%
+  group_by(col, grouping) %>%
+  mutate(norm.activity = 100 * activity / max(activity, na.rm = TRUE))
+well_twos.df <- ungroup(well_twos.df)
+
+for (i in 1:nrow(well_twos.df)) {
+  if (!is.finite(well_twos.df$activity[i])) well_twos.df$activity[i] <- NA
+  if (!is.finite(well_twos.df$norm.activity[i])) well_twos.df$norm.activity[i] <- NA
+}
+
+well_twos_params.df <- data.frame(strain = rep(strains, each = 4), col = rep(1:12, each = 4), grouping = rep(1:4, nStrains), bparam = rep(0, nStrains * 4), cparam = rep(0, nStrains * 4))
+
+l = 1
+
+for (x in 1:12) {
+  for (y in 1:4) {
+    if (!(is.na(well_twos.df$norm.activity[well_twos.df$grouping == y & well_twos.df$col == x]))[1] == TRUE) {
+      temp <- nlm(well_twoplog_grouping, c(2, 10), well_twos.df, y, x)[["estimate"]]
+      well_twos_params.df$bparam[l] <- temp[1]
+      well_twos_params.df$cparam[l] <- temp[2]
+    }
+    l = l + 1
+  }
+}
+
+well_twos_survivals.df <- data.frame(day = times)
+
+l <- 2
+
+for (x in 1:12) {
+  for (y in 1:4) {
+    well_twos_survivals.df[l] <- draw_twoplog(well_twos_params.df$bparam[well_twos_params.df$col == x & well_twos_params.df$grouping == y], well_twos_params.df$cparam[well_twos_params.df$col == x & well_twos_params.df$grouping == y])
+    l <- l + 1
+  }
+}
+
+well_twos_survivals.df <- well_twos_survivals.df %>% gather(strain, yvalue, 2:49)
+well_twos.df$yvalue <- well_twos_survivals.df$yvalue
+
+for (i in 1:nrow(well_twos.df)) {
+  if (is.na(well_twos.df$norm.activity[i]) == TRUE) {
+    well_twos.df$yvalue[i] <- NA
+  }
+}
+
+ggplot(well_twos.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + guides(color = FALSE)
+
+```
+
+## Three Wells Fits ##
+
+```{r Threes_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+well.df$grouping <- rep(rep(c(1, 1, 1, 2, 2, 2, 3, 3), each = nFiles), 12)
+
+well_threes.df <- well.df %>%
+  group_by(col, strain, uniqueStrain, grouping, day) %>%
+  summarise(activity = mean(activity, na.rm = TRUE))
+well_threes.df <- ungroup(well_threes.df)
+
+well_threes.df <- well_threes.df %>%
+  group_by(col, grouping) %>%
+  mutate(norm.activity = 100 * activity / max(activity, na.rm = TRUE))
+well_threes.df <- ungroup(well_threes.df)
+
+for (i in 1:nrow(well_threes.df)) {
+  if (!is.finite(well_threes.df$activity[i])) well_threes.df$activity[i] <- NA
+  if (!is.finite(well_threes.df$norm.activity[i])) well_threes.df$norm.activity[i] <- NA
+}
+
+well_threes_params.df <- data.frame(strain = rep(strains, each = 3), col = rep(1:12, each = 3), grouping = rep(1:3, nStrains), bparam = rep(0, nStrains * 3), cparam = rep(0, nStrains * 3))
+
+l = 1
+
+for (x in 1:12) {
+  for (y in 1:3) {
+    if (!(is.na(well_threes.df$norm.activity[well_threes.df$grouping == y & well_threes.df$col == x]))[1] == TRUE) {
+      temp <- nlm(well_twoplog_grouping, c(2, 10), well_threes.df, y, x)[["estimate"]]
+      well_threes_params.df$bparam[l] <- temp[1]
+      well_threes_params.df$cparam[l] <- temp[2]
+    }
+    l = l + 1
+  }
+}
+
+well_threes_survivals.df <- data.frame(day = times)
+
+l <- 2
+
+for (x in 1:12) {
+  for (y in 1:3) {
+    well_threes_survivals.df[l] <- draw_twoplog(well_threes_params.df$bparam[well_threes_params.df$col == x & well_threes_params.df$grouping == y], well_threes_params.df$cparam[well_threes_params.df$col == x & well_threes_params.df$grouping == y])
+    l <- l + 1
+  }
+}
+
+well_threes_survivals.df <- well_threes_survivals.df %>% gather(strain, yvalue, 2:37)
+well_threes.df$yvalue <- well_threes_survivals.df$yvalue
+
+for (i in 1:nrow(well_threes.df)) {
+  if (is.na(well_threes.df$norm.activity[i]) == TRUE) {
+    well_threes.df$yvalue[i] <- NA
+  }
+}
+
+ggplot(well_threes.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + guides(color = FALSE)
+
+```
+
+## Four Wells Fits ##
+
+```{r Fours_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+well.df$grouping <- rep(rep(1:2, each = nFiles * 4), 12)
+
+well_fours.df <- well.df %>%
+  group_by(col, strain, uniqueStrain, grouping, day) %>%
+  summarise(activity = mean(activity, na.rm = TRUE))
+well_fours.df <- ungroup(well_fours.df)
+
+well_fours.df <- well_fours.df %>%
+  group_by(col, grouping) %>%
+  mutate(norm.activity = 100 * activity / max(activity, na.rm = TRUE))
+well_fours.df <- ungroup(well_fours.df)
+
+for (i in 1:nrow(well_fours.df)) {
+  if (!is.finite(well_fours.df$activity[i])) well_fours.df$activity[i] <- NA
+  if (!is.finite(well_fours.df$norm.activity[i])) well_fours.df$norm.activity[i] <- NA
+}
+
+well_fours_params.df <- data.frame(strain = rep(strains, each = 2), col = rep(1:12, each = 2), grouping = rep(1:2, nStrains), bparam = rep(0, nStrains * 2), cparam = rep(0, nStrains * 2))
+
+l = 1
+
+for (x in 1:12) {
+  for (y in 1:2) {
+    if (!(is.na(well_fours.df$norm.activity[well_fours.df$grouping == y & well_fours.df$col == x]))[1] == TRUE) {
+      temp <- nlm(well_twoplog_grouping, c(2, 10), well_fours.df, y, x)[["estimate"]]
+      well_fours_params.df$bparam[l] <- temp[1]
+      well_fours_params.df$cparam[l] <- temp[2]
+    }
+    l = l + 1
+  }
+}
+
+well_fours_survivals.df <- data.frame(day = times)
+
+l <- 2
+
+for (x in 1:12) {
+  for (y in 1:2) {
+    well_fours_survivals.df[l] <- draw_twoplog(well_fours_params.df$bparam[well_fours_params.df$col == x & well_fours_params.df$grouping == y], well_fours_params.df$cparam[well_fours_params.df$col == x & well_fours_params.df$grouping == y])
+    l <- l + 1
+  }
+}
+
+well_fours_survivals.df <- well_fours_survivals.df %>% gather(strain, yvalue, 2:25)
+well_fours.df$yvalue <- well_fours_survivals.df$yvalue
+
+for (i in 1:nrow(well_fours.df)) {
+  if (is.na(well_fours.df$norm.activity[i]) == TRUE) {
+    well_fours.df$yvalue[i] <- NA
+  }
+}
+
+ggplot(well_fours.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + guides(color = FALSE)
+
+```
+
+## Eight Wells Fits ##
+
+```{r Eights_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+well.df$grouping <- rep(rep(1, each = nFiles * 8), 12)
+
+well_eights.df <- well.df %>%
+  group_by(col, strain, uniqueStrain, grouping, day) %>%
+  summarise(activity = mean(activity, na.rm = TRUE))
+well_eights.df <- ungroup(well_eights.df)
+
+well_eights.df <- well_eights.df %>%
+  group_by(col, grouping) %>%
+  mutate(norm.activity = 100 * activity / max(activity, na.rm = TRUE))
+well_eights.df <- ungroup(well_eights.df)
+
+for (i in 1:nrow(well_eights.df)) {
+  if (!is.finite(well_eights.df$activity[i])) well_eights.df$activity[i] <- NA
+  if (!is.finite(well_eights.df$norm.activity[i])) well_eights.df$norm.activity[i] <- NA
+}
+
+well_eights_params.df <- data.frame(strain = strains, col = 1:12, grouping = rep(1, nStrains), bparam = rep(0, nStrains), cparam = rep(0, nStrains))
+
+l = 1
+
+for (x in 1:12) {
+  for (y in 1) {
+    if (!(is.na(well_eights.df$norm.activity[well_eights.df$grouping == y & well_eights.df$col == x]))[1] == TRUE) {
+      temp <- nlm(well_twoplog_grouping, c(2, 10), well_eights.df, y, x)[["estimate"]]
+      well_eights_params.df$bparam[l] <- temp[1]
+      well_eights_params.df$cparam[l] <- temp[2]
+    }
+    l = l + 1
+  }
+}
+
+well_eights_survivals.df <- data.frame(day = times)
+
+l <- 2
+
+for (x in 1:12) {
+  for (y in 1) {
+    well_eights_survivals.df[l] <- draw_twoplog(well_eights_params.df$bparam[well_eights_params.df$col == x & well_eights_params.df$grouping == y], well_eights_params.df$cparam[well_eights_params.df$col == x & well_eights_params.df$grouping == y])
+    l <- l + 1
+  }
+}
+
+well_eights_survivals.df <- well_eights_survivals.df %>% gather(strain, yvalue, 2:13)
+well_eights.df$yvalue <- well_eights_survivals.df$yvalue
+
+for (i in 1:nrow(well_eights.df)) {
+  if (is.na(well_eights.df$norm.activity[i]) == TRUE) {
+    well_eights.df$yvalue[i] <- NA
+  }
+}
+
+ggplot(well_eights.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ uniqueStrain) + ylim(0, 100) + presentation + guides(color = FALSE)
+
+```
+
+## Strain Fits ##
+
+```{r Strain_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+strain.df <- well.df %>%
+  group_by(strain, day) %>%
+  summarise(activity = mean(activity, na.rm = TRUE))
+strain.df <- ungroup(strain.df)
+
+strain.df <- strain.df %>%
+  group_by(strain) %>%
+  mutate(norm.activity = 100 * activity / max(activity, na.rm = TRUE))
+strain.df <- ungroup(strain.df)
+
+for (i in 1:nrow(strain.df)) {
+  if (!is.finite(strain.df$activity[i])) strain.df$activity[i] <- NA
+  if (!is.finite(strain.df$norm.activity[i])) strain.df$norm.activity[i] <- NA
+}
+
+strain_params.df <- data.frame(strain = unique(strains), bparam = rep(0, length(unique(strains))), cparam = rep(0, length(unique(strains))))
+
+l = 1
+
+for (x in unique(strains)) {
+  if (!(is.na(strain.df$norm.activity[strain.df$strain == x]))[1] == TRUE) {
+    temp <- nlm(strain_twoplog, c(2, 1), strain.df, x)[["estimate"]]
+    strain_params.df$bparam[l] <- temp[1]
+    strain_params.df$cparam[l] <- temp[2]
+  }
+  l = l + 1
+}
+
+strain_survivals.df <- data.frame(day = times)
+
+l <- 2
+
+for (x in unique(strain.df$strain)) {
+    strain_survivals.df[l] <- draw_twoplog(strain_params.df$bparam[strain_params.df$strain == x], strain_params.df$cparam[strain_params.df$strain == x])
+    l <- l + 1
+}
+
+strain_survivals.df <- strain_survivals.df %>% gather(strain, yvalue, 2:(ncol(strain_survivals.df)))
+strain.df$yvalue <- strain_survivals.df$yvalue
+
+for (i in 1:nrow(strain.df)) {
+  if (is.na(strain.df$norm.activity[i]) == TRUE) {
+    strain.df$yvalue[i] <- NA
+  }
+}
+
+ggplot(strain.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_wrap( ~ strain) + ylim(0, 100) + presentation + guides(color = FALSE)
+
+```
+
+## Distribution of Parameters ##
+
+```{r Parameters, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+params.df <- well_params.df %>% bind_rows(well_twos_params.df) %>% bind_rows(well_threes_params.df) %>% bind_rows(well_fours_params.df) %>% bind_rows(well_eights_params.df) %>% bind_rows(strain_params.df)
+params.df$grouping <- c(rep("well", nrow(well_params.df)), rep("twos", nrow(well_twos_params.df)), rep("threes", nrow(well_threes_params.df)), rep("fours", nrow(well_fours_params.df)), rep("eights", nrow(well_eights_params.df)), rep("strain", nrow(strain_params.df)))
+
+params.df$grouping <- ordered(params.df$grouping, levels = c("well", "twos", "threes", "fours", "eights", "strain"))
+
+for (i in 1:nrow(params.df)) {
+  if (params.df$bparam[i] == 0 & params.df$cparam[i] == 0) {
+    params.df$bparam[i] <- NA
+    params.df$cparam[i] <- NA
+  }
+}
+
+ggplot(params.df) + aes(x = bparam, y = cparam, size = grouping, color = grouping) + geom_point(alpha = 0.5) + facet_wrap( ~ strain) + ylim(0, 25) + xlim(0, 4) + presentation
+
+params.df %>% filter(grouping == "well") %>% ggplot(.) + aes(x = strain, y = bparam) + geom_boxplot() + geom_jitter() + presentation + ylim(0, 3)
+
+params.df %>% filter(grouping == "well") %>% ggplot(.) + aes(x = strain, y = cparam) + geom_boxplot() + geom_jitter() + presentation + ylim(0, 33)
+
+params.df %>% filter(grouping == "twos") %>% ggplot(.) + aes(x = strain, y = bparam) + geom_boxplot() + geom_jitter() + presentation + ylim(0, 3)
+
+params.df %>% filter(grouping == "twos") %>% ggplot(.) + aes(x = strain, y = cparam) + geom_boxplot() + geom_jitter() + presentation + ylim(0, 33)
+
+params.df %>% filter(grouping == "threes") %>% ggplot(.) + aes(x = strain, y = bparam) + geom_boxplot() + geom_jitter() + presentation + ylim(0, 3)
+
+params.df %>% filter(grouping == "threes") %>% ggplot(.) + aes(x = strain, y = cparam) + geom_boxplot() + geom_jitter() + presentation + ylim(0, 33)
+
+params.df %>% filter(grouping == "fours") %>% ggplot(.) + aes(x = strain, y = bparam) + geom_boxplot() + geom_jitter() + presentation + ylim(0, 3)
+
+params.df %>% filter(grouping == "fours") %>% ggplot(.) + aes(x = strain, y = cparam) + geom_boxplot() + geom_jitter() + presentation + ylim(0, 33)
+
+params.df %>% filter(grouping == "eights") %>% ggplot(.) + aes(x = strain, y = bparam) + geom_boxplot() + geom_jitter() + presentation + ylim(0, 3)
+
+params.df %>% filter(grouping == "eights") %>% ggplot(.) + aes(x = strain, y = cparam) + geom_boxplot() + geom_jitter() + presentation + ylim(0, 33)
+
+```
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+
+heritabilities <- data.frame(parameter = rep(c("bparam", "cparam"), length(unique(params.df$grouping))), grouping = rep(unique(params.df$grouping), each = 2), herit = rep(0, length(unique(params.df$grouping)) * 2))
+
+for (i in (1:length(unique(params.df$grouping))) * 2) {
+  x <- params.df %>% filter(grouping == levels(params.df$grouping)[i / 2]) %>% select(c(strain, bparam))
+  x$pheno <- x$bparam
+  x <- x %>% select(c(strain, pheno))
+  heritabilities$herit[i - 1] <- H2.fun(x)
+
+  x <- params.df %>% filter(grouping == levels(params.df$grouping)[i / 2]) %>% select(c(strain, cparam))
+  x$pheno <- x$cparam
+  x <- x %>% select(c(strain, pheno))
+  heritabilities$herit[i] <- H2.fun(x)
+}
+
+save(heritabilities, file = paste(processedDataPath, "/", experimentName, "_herit.Rda", sep = ""))
+
+```
+
+## Heritability of Parameters ##
+
+```{r Heritability, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+plotting.df <- heritabilities %>% filter(as.numeric(grouping) < 6)
+
+ggplot(plotting.df) + aes(x = as.numeric(grouping), y = herit, color = parameter, size = 2) + geom_line() + labs(x = "Grouping", y = "Heritability") + ylim(0, 1) + presentation + guides(size = FALSE)
+
+```

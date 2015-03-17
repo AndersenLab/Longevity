@@ -196,6 +196,32 @@ ggplot(well.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x 
 
 ```
 
+## Single Well Combination Heritability ##
+
+```{r}
+
+daf2.df <- well.df %>% filter(strain == "daf-2")
+daf2.df$index <- rep(1:32, each = nFiles)
+daf16.df <- well.df %>% filter(strain == "daf-16")
+daf16.df$index <- rep(1:32, each = nFiles)
+N2.df <- well.df %>% filter(strain == "N2")
+N2.df$index <- rep(1:32, each = nFiles)
+
+daf2notNA.df <- daf2.df %>% filter(is.na(activity) != TRUE)
+daf16notNA.df <- daf16.df %>% filter(is.na(activity) != TRUE)
+N2notNA.df <- N2.df %>% filter(is.na(activity) != TRUE)
+
+daf2sample <- unique(daf2notNA.df$index)
+daf2.numWells <- length(daf2sample)
+daf16sample <- unique(daf16notNA.df$index)
+daf16.numWells <- length(daf16sample)
+N2sample <- unique(N2notNA.df$index)
+N2.numWells <- length(N2sample)
+
+minSamples <- min(daf2.numWells, daf16.numWells, N2.numWells)
+
+```
+
 ## Two Wells Fits ##
 
 ```{r Pair_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}

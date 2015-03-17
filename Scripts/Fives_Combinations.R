@@ -1,0 +1,132 @@
+strain1random <- create.sample.5(1)
+strain1.1 <- combine.five(strain1notNA.df, strain1random[ , 1])
+strain1.2 <- combine.five(strain1notNA.df, strain1random[ , 2])
+strain1.3 <- combine.five(strain1notNA.df, strain1random[ , 3])
+strain1.4 <- combine.five(strain1notNA.df, strain1random[ , 4])
+strain1.5 <- combine.five(strain1notNA.df, strain1random[ , 5])
+strain1combined <- bind_rows(strain1.1, strain1.2, strain1.3, strain1.4, strain1.5)
+strain1combined$replicate <- rep(1:5, each = nFiles)
+strain2random <- create.sample.5(2)
+strain2.1 <- combine.five(strain2notNA.df, strain2random[ , 1])
+strain2.2 <- combine.five(strain2notNA.df, strain2random[ , 2])
+strain2.3 <- combine.five(strain2notNA.df, strain2random[ , 3])
+strain2.4 <- combine.five(strain2notNA.df, strain2random[ , 4])
+strain2.5 <- combine.five(strain2notNA.df, strain2random[ , 5])
+strain2combined <- bind_rows(strain2.1, strain2.2, strain2.3, strain2.4, strain2.5)
+strain2combined$replicate <- rep(1:5, each = nFiles)
+strain3random <- create.sample.5(3)
+strain3.1 <- combine.five(strain3notNA.df, strain3random[ , 1])
+strain3.2 <- combine.five(strain3notNA.df, strain3random[ , 2])
+strain3.3 <- combine.five(strain3notNA.df, strain3random[ , 3])
+strain3.4 <- combine.five(strain3notNA.df, strain3random[ , 4])
+strain3.5 <- combine.five(strain3notNA.df, strain3random[ , 5])
+strain3combined <- bind_rows(strain3.1, strain3.2, strain3.3, strain3.4, strain3.5)
+strain3combined$replicate <- rep(1:5, each = nFiles)
+strain4random <- create.sample.5(4)
+strain4.1 <- combine.five(strain4notNA.df, strain4random[ , 1])
+strain4.2 <- combine.five(strain4notNA.df, strain4random[ , 2])
+strain4.3 <- combine.five(strain4notNA.df, strain4random[ , 3])
+strain4.4 <- combine.five(strain4notNA.df, strain4random[ , 4])
+strain4.5 <- combine.five(strain4notNA.df, strain4random[ , 5])
+strain4combined <- bind_rows(strain4.1, strain4.2, strain4.3, strain4.4, strain4.5)
+strain4combined$replicate <- rep(1:5, each = nFiles)
+strain5random <- create.sample.5(5)
+strain5.1 <- combine.five(strain5notNA.df, strain5random[ , 1])
+strain5.2 <- combine.five(strain5notNA.df, strain5random[ , 2])
+strain5.3 <- combine.five(strain5notNA.df, strain5random[ , 3])
+strain5.4 <- combine.five(strain5notNA.df, strain5random[ , 4])
+strain5.5 <- combine.five(strain5notNA.df, strain5random[ , 5])
+strain5combined <- bind_rows(strain5.1, strain5.2, strain5.3, strain5.4, strain5.5)
+strain5combined$replicate <- rep(1:5, each = nFiles)
+strain6random <- create.sample.5(6)
+strain6.1 <- combine.five(strain6notNA.df, strain6random[ , 1])
+strain6.2 <- combine.five(strain6notNA.df, strain6random[ , 2])
+strain6.3 <- combine.five(strain6notNA.df, strain6random[ , 3])
+strain6.4 <- combine.five(strain6notNA.df, strain6random[ , 4])
+strain6.5 <- combine.five(strain6notNA.df, strain6random[ , 5])
+strain6combined <- bind_rows(strain6.1, strain6.2, strain6.3, strain6.4, strain6.5)
+strain6combined$replicate <- rep(1:5, each = nFiles)
+strain7random <- create.sample.5(7)
+strain7.1 <- combine.five(strain7notNA.df, strain7random[ , 1])
+strain7.2 <- combine.five(strain7notNA.df, strain7random[ , 2])
+strain7.3 <- combine.five(strain7notNA.df, strain7random[ , 3])
+strain7.4 <- combine.five(strain7notNA.df, strain7random[ , 4])
+strain7.5 <- combine.five(strain7notNA.df, strain7random[ , 5])
+strain7combined <- bind_rows(strain7.1, strain7.2, strain7.3, strain7.4, strain7.5)
+strain7combined$replicate <- rep(1:5, each = nFiles)
+strain8random <- create.sample.5(8)
+strain8.1 <- combine.five(strain8notNA.df, strain8random[ , 1])
+strain8.2 <- combine.five(strain8notNA.df, strain8random[ , 2])
+strain8.3 <- combine.five(strain8notNA.df, strain8random[ , 3])
+strain8.4 <- combine.five(strain8notNA.df, strain8random[ , 4])
+strain8.5 <- combine.five(strain8notNA.df, strain8random[ , 5])
+strain8combined <- bind_rows(strain8.1, strain8.2, strain8.3, strain8.4, strain8.5)
+strain8combined$replicate <- rep(1:5, each = nFiles)
+strain9random <- create.sample.5(9)
+strain9.1 <- combine.five(strain9notNA.df, strain9random[ , 1])
+strain9.2 <- combine.five(strain9notNA.df, strain9random[ , 2])
+strain9.3 <- combine.five(strain9notNA.df, strain9random[ , 3])
+strain9.4 <- combine.five(strain9notNA.df, strain9random[ , 4])
+strain9.5 <- combine.five(strain9notNA.df, strain9random[ , 5])
+strain9combined <- bind_rows(strain9.1, strain9.2, strain9.3, strain9.4, strain9.5)
+strain9combined$replicate <- rep(1:5, each = nFiles)
+strain10random <- create.sample.5(10)
+strain10.1 <- combine.five(strain10notNA.df, strain10random[ , 1])
+strain10.2 <- combine.five(strain10notNA.df, strain10random[ , 2])
+strain10.3 <- combine.five(strain10notNA.df, strain10random[ , 3])
+strain10.4 <- combine.five(strain10notNA.df, strain10random[ , 4])
+strain10.5 <- combine.five(strain10notNA.df, strain10random[ , 5])
+strain10combined <- bind_rows(strain10.1, strain10.2, strain10.3, strain10.4, strain10.5)
+strain10combined$replicate <- rep(1:5, each = nFiles)
+strain11random <- create.sample.5(11)
+strain11.1 <- combine.five(strain11notNA.df, strain11random[ , 1])
+strain11.2 <- combine.five(strain11notNA.df, strain11random[ , 2])
+strain11.3 <- combine.five(strain11notNA.df, strain11random[ , 3])
+strain11.4 <- combine.five(strain11notNA.df, strain11random[ , 4])
+strain11.5 <- combine.five(strain11notNA.df, strain11random[ , 5])
+strain11combined <- bind_rows(strain11.1, strain11.2, strain11.3, strain11.4, strain11.5)
+strain11combined$replicate <- rep(1:5, each = nFiles)
+strain12random <- create.sample.5(12)
+strain12.1 <- combine.five(strain12notNA.df, strain12random[ , 1])
+strain12.2 <- combine.five(strain12notNA.df, strain12random[ , 2])
+strain12.3 <- combine.five(strain12notNA.df, strain12random[ , 3])
+strain12.4 <- combine.five(strain12notNA.df, strain12random[ , 4])
+strain12.5 <- combine.five(strain12notNA.df, strain12random[ , 5])
+strain12combined <- bind_rows(strain12.1, strain12.2, strain12.3, strain12.4, strain12.5)
+strain12combined$replicate <- rep(1:5, each = nFiles)
+
+fives.combined.df <- bind_rows(strain1combined, strain2combined, strain5combined, strain6combined,
+                               strain7combined, strain8combined, strain10combined, strain11combined, strain12combined)
+fives.combined.df$strain <- rep(c(1:2, 5:8, 10:12), each = 5 * nFiles)
+
+fives.combined.df <- fives.combined.df %>%
+  group_by(strain, replicate) %>%
+  mutate(norm.activity = 100 * activity / max(activity))
+
+
+well_fives_params_threeplog.df <- data.frame(strain = rep(c(1:2, 5:8, 10:12), each = 5), 
+                                   replicate = rep(1:5, 9), 
+                                   aparam = 0, bparam = 0, kparam = 0, minimum = 0)
+
+l = 1
+
+for (k in c(1:2, 5:8, 10:12)) {
+  for (j in 1:5) {
+    temp <- nlm(well_threeplog_sample, c(0.01, 0.1, 0.06), fives.combined.df, j, k)
+    well_fives_params_threeplog.df$aparam[l] <- temp[["estimate"]][1]
+    well_fives_params_threeplog.df$bparam[l] <- temp[["estimate"]][2]
+    well_fives_params_threeplog.df$kparam[l] <- temp[["estimate"]][3]
+    well_fives_params_threeplog.df$minimum[l] <- temp[["minimum"]][1]
+    l = l + 1
+  }
+}
+
+x <- well_fives_params_threeplog.df %>% select(c(strain, bparam))
+x$pheno <- x$bparam
+x <- x %>% select(c(strain, pheno))
+H2.fun(x)
+
+x <- well_fives_params_threeplog.df %>% select(c(strain, cparam))
+x$pheno <- x$cparam
+x <- x %>% select(c(strain, pheno))
+H2.fun(x)

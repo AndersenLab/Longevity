@@ -148,225 +148,80 @@ times <- unique(well.df$day)
 
 ```
 
-## Individual Well Fits ##
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 
-```{r Well_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+ones.herit.b <- c(0.557729, 0.552918, 0.580895, 0.5695891, 0.7723634)
+ones.herit.c <- c(0.635646, 0.7110813, 0.6242544, 0.6842176, 0.7799259)
+twos.herit.b <- c(0.7573, 0.7595694, 0.7908228, 0.8463647, 0.8096861)
+twos.herit.c <- c(0.9063625, 0.8294022, 0.8428379, 0.8479334, 0.8935985)
+threes.herit.b <- c(0.8340014, 0.8867108, 0.8284821, 0.8570274, 0.8587352)
+threes.herit.c <- c(0.8763584, 0.9269582, 0.886682, 0.9135971, 0.9273542)
+fours.herit.b <- c(0.9420008, 0.9407393, 0.9337575, 0.9158983, 0.9295355)
+fours.herit.c <- c(0.9427221, 0.9614862, 0.9351783, 0.9429971, 0.9604444)
+fives.herit.b <- c(0.9744677, 0.9738441, 0.9659856, 0.9641152, 0.9699289)
+fives.herit.c <- c(0.973524, 0.9754177, 0.970634, 0.9582531, 0.9586009)
 
-well.df <- well.df %>%
-  group_by(col, row) %>%
-  mutate(norm.activity = 100 * activity / max(activity, na.rm = TRUE))
-well.df <- ungroup(well.df)
+ones.herit.a <- 0.53
+ones.herit.b <- 0.008
+ones.herit.k <- 0.25
+twos.herit.a <- 0.83
+twos.herit.b <- 0.00
+twos.herit.k <- 0.87
+threes.herit.a <- 0.92
+threes.herit.b <- 0.61
+threes.herit.k <- 0.90
+fours.herit.a <- 0.94
+fours.herit.b <- 0.27
+fours.herit.k <- 0.74
+fives.herit.a <- 0.97
+fives.herit.b <- 0.47
+fives.herit.k <- 0.94
 
-well_params.df <- data.frame(strain = rep(strains, each = length(rows)), col = rep(1:12, each = length(rows)), row = rep(rows, nStrains), bparam = rep(0, nStrains * replicates), cparam = rep(0, nStrains * replicates))
+ones.herit.50 <- 0.27
+ones.herit.10 <- 0.21
+twos.herit.50 <- 0.64
+twos.herit.10 <- 0.51
+threes.herit.50 <- 0.81
+threes.herit.10 <- 0.49
+fours.herit.50 <- 0.81
+fours.herit.10 <- 0.59
+fives.herit.50 <- 0.96
+fives.herit.10 <- 0.79
 
-l = 1
+ones.herit.A <- 0.85
+ones.herit.G <- 0.82
+twos.herit.A <- 0.83
+twos.herit.G <- 0.87
+threes.herit.A <- 0.92
+threes.herit.G <- 0.90
+fours.herit.A <- 0.94
+fours.herit.G <- 0.96
+fives.herit.A <- 0.97
+fives.herit.G <- 0.97
 
-for (x in 1:12) {
-  for (y in rows) {
-    if (!(is.na(well.df$norm.activity[well.df$row == y & well.df$col == x]))[1] == TRUE) {
-      temp <- nlm(well_twoplog, c(2, 10), well.df, y, x)[["estimate"]]
-      well_params.df$bparam[l] <- temp[1]
-      well_params.df$cparam[l] <- temp[2]
-    }
-    l = l + 1
-  }
-}
+ones.herit.a <- 0.66
+ones.herit.b <- 0.28
+twos.herit.a <- 0.06
+twos.herit.b <- 0.71
+threes.herit.a <- 0.81
+threes.herit.b <- 0.89
+fours.herit.a <- 0.94
+fours.herit.b <- 0.92
+fives.herit.a <- 0.95
+fives.herit.b <- 0.97
 
-well_survivals.df <- data.frame(day = times)
+heritability <- data.frame(herit = c(ones.herit.a, ones.herit.b, twos.herit.a, twos.herit.b, threes.herit.a, threes.herit.b, fours.herit.a, fours.herit.b,
+                                      fives.herit.a, fives.herit.b),
+                           parameter = rep(c("a", "b"), 5),
+                           number = rep(1:5, each = 2))
 
-l <- 2
+herit.summarized <- heritability %>%
+  group_by(parameter, number) %>%
+  summarize(herit.mean = mean(herit),
+            herit.sd = sd(herit))
 
-for (x in 1:12) {
-  for (y in rows) {
-    well_survivals.df[l] <- draw_twoplog(well_params.df$bparam[well_params.df$col == x & well_params.df$row == y], well_params.df$cparam[well_params.df$col == x & well_params.df$row == y])
-    l <- l + 1
-  }
-}
+ggplot(heritability) + geom_line(aes(x = number, y = herit, color = parameter), size = 2) + ylim(0, 1) + presentation + big.legend + labs(x = "Number of Replicates", y = "Heritability")
 
-well_survivals.df <- well_survivals.df %>% gather(strain, yvalue, 2:97)
-well.df$yvalue <- well_survivals.df$yvalue
-
-for (i in 1:nrow(well.df)) {
-  if (is.na(well.df$norm.activity[i]) == TRUE) {
-    well.df$yvalue[i] <- NA
-  }
-}
-
-ggplot(well.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red")) + facet_grid(row ~ col, labeller = label_strains) + ylim(0, 100) + presentation + guides(color = FALSE)
-
-```
-
-## Two Wells Fits ##
-
-```{r Pair_Fits, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
-
-## Let's group the wells into pairs and perform curve fitting. ##
-
-strain1.df <- well.df %>% filter(strain == strains[1])
-strain1.df$index <- rep(1:8, each = nFiles)
-strain2.df <- well.df %>% filter(strain == strains[2])
-strain2.df$index <- rep(1:8, each = nFiles)
-strain3.df <- well.df %>% filter(strain == strains[3])
-strain3.df$index <- rep(1:8, each = nFiles)
-strain4.df <- well.df %>% filter(strain == strains[4])
-strain4.df$index <- rep(1:8, each = nFiles)
-strain5.df <- well.df %>% filter(strain == strains[5])
-strain5.df$index <- rep(1:8, each = nFiles)
-strain6.df <- well.df %>% filter(strain == strains[6])
-strain6.df$index <- rep(1:8, each = nFiles)
-strain7.df <- well.df %>% filter(strain == strains[7])
-strain7.df$index <- rep(1:8, each = nFiles)
-strain8.df <- well.df %>% filter(strain == strains[8])
-strain8.df$index <- rep(1:8, each = nFiles)
-strain9.df <- well.df %>% filter(strain == strains[9])
-strain9.df$index <- rep(1:8, each = nFiles)
-strain10.df <- well.df %>% filter(strain == strains[10])
-strain10.df$index <- rep(1:8, each = nFiles)
-strain11.df <- well.df %>% filter(strain == strains[11])
-strain11.df$index <- rep(1:8, each = nFiles)
-strain12.df <- well.df %>% filter(strain == strains[12])
-strain12.df$index <- rep(1:8, each = nFiles)
-
-strain1notNA.df <- strain1.df %>% filter(is.na(activity) != TRUE)
-strain2notNA.df <- strain2.df %>% filter(is.na(activity) != TRUE)
-strain3notNA.df <- strain3.df %>% filter(is.na(activity) != TRUE)
-strain4notNA.df <- strain4.df %>% filter(is.na(activity) != TRUE)
-strain5notNA.df <- strain5.df %>% filter(is.na(activity) != TRUE)
-strain6notNA.df <- strain6.df %>% filter(is.na(activity) != TRUE)
-strain7notNA.df <- strain7.df %>% filter(is.na(activity) != TRUE)
-strain8notNA.df <- strain8.df %>% filter(is.na(activity) != TRUE)
-strain9notNA.df <- strain9.df %>% filter(is.na(activity) != TRUE)
-strain10notNA.df <- strain10.df %>% filter(is.na(activity) != TRUE)
-strain11notNA.df <- strain11.df %>% filter(is.na(activity) != TRUE)
-strain12notNA.df <- strain12.df %>% filter(is.na(activity) != TRUE)
-
-strain1sample <- unique(strain1notNA.df$index)
-strain1.numWells <- length(strain1sample)
-strain2sample <- unique(strain2notNA.df$index)
-strain2.numWells <- length(strain2sample)
-strain3sample <- unique(strain3notNA.df$index)
-strain3.numWells <- length(strain3sample)
-strain4sample <- unique(strain4notNA.df$index)
-strain4.numWells <- length(strain4sample)
-strain5sample <- unique(strain5notNA.df$index)
-strain5.numWells <- length(strain5sample)
-strain6sample <- unique(strain6notNA.df$index)
-strain6.numWells <- length(strain6sample)
-strain7sample <- unique(strain7notNA.df$index)
-strain7.numWells <- length(strain7sample)
-strain8sample <- unique(strain8notNA.df$index)
-strain8.numWells <- length(strain8sample)
-strain9sample <- unique(strain9notNA.df$index)
-strain9.numWells <- length(strain9sample)
-strain10sample <- unique(strain10notNA.df$index)
-strain10.numWells <- length(strain10sample)
-strain11sample <- unique(strain11notNA.df$index)
-strain11.numWells <- length(strain11sample)
-strain12sample <- unique(strain12notNA.df$index)
-strain12.numWells <- length(strain12sample)
-
-master.herit <- data.frame(samples = 2:8, b.mean = 0, b.sd = 0, c.mean = 0, c.sd = 0)
-
-for (i in master.herit$samples) {
-  
-  strain1notNA.df$index <- rep(sample(1:strain1.numWells, strain1.numWells, replace = FALSE), each = nFiles)
-  strain1notNA.df <- strain1notNA.df[order(strain1notNA.df$index), ]
-  strain2notNA.df$index <- rep(sample(1:strain2.numWells, strain2.numWells, replace = FALSE), each = nFiles)
-  strain2notNA.df <- strain2notNA.df[order(strain2notNA.df$index), ]
-  strain3notNA.df$index <- rep(sample(1:strain3.numWells, strain3.numWells, replace = FALSE), each = nFiles)
-  strain3notNA.df <- strain3notNA.df[order(strain3notNA.df$index), ]
-  strain4notNA.df$index <- rep(sample(1:strain4.numWells, strain4.numWells, replace = FALSE), each = nFiles)
-  strain4notNA.df <- strain4notNA.df[order(strain4notNA.df$index), ]
-  strain5notNA.df$index <- rep(sample(1:strain5.numWells, strain5.numWells, replace = FALSE), each = nFiles)
-  strain5notNA.df <- strain5notNA.df[order(strain5notNA.df$index), ]
-  strain6notNA.df$index <- rep(sample(1:strain6.numWells, strain6.numWells, replace = FALSE), each = nFiles)
-  strain6notNA.df <- strain6notNA.df[order(strain6notNA.df$index), ]
-  strain7notNA.df$index <- rep(sample(1:strain7.numWells, strain7.numWells, replace = FALSE), each = nFiles)
-  strain7notNA.df <- strain7notNA.df[order(strain7notNA.df$index), ]
-  strain8notNA.df$index <- rep(sample(1:strain8.numWells, strain8.numWells, replace = FALSE), each = nFiles)
-  strain8notNA.df <- strain8notNA.df[order(strain8notNA.df$index), ]
-  strain9notNA.df$index <- rep(sample(1:strain9.numWells, strain9.numWells, replace = FALSE), each = nFiles)
-  strain9notNA.df <- strain9notNA.df[order(strain9notNA.df$index), ]
-  strain10notNA.df$index <- rep(sample(1:strain10.numWells, strain10.numWells, replace = FALSE), each = nFiles)
-  strain10notNA.df <- strain10notNA.df[order(strain10notNA.df$index), ]
-  strain11notNA.df$index <- rep(sample(1:strain11.numWells, strain11.numWells, replace = FALSE), each = nFiles)
-  strain11notNA.df <- strain11notNA.df[order(strain11notNA.df$index), ]
-  strain12notNA.df$index <- rep(sample(1:strain12.numWells, strain12.numWells, replace = FALSE), each = nFiles)
-  strain12notNA.df <- strain12notNA.df[order(strain12notNA.df$index), ]
-
-  strain1choose <- strain1.numWells %/% i
-  strain2choose <- strain2.numWells %/% i
-  strain3choose <- strain3.numWells %/% i
-  strain4choose <- strain4.numWells %/% i
-  strain5choose <- strain5.numWells %/% i
-  strain6choose <- strain6.numWells %/% i
-  strain7choose <- strain7.numWells %/% i
-  strain8choose <- strain8.numWells %/% i
-  strain9choose <- strain9.numWells %/% i
-  strain10choose <- strain10.numWells %/% i
-  strain11choose <- strain11.numWells %/% i
-  strain12choose <- strain12.numWells %/% i
-
-  mintochoose <- min(daf2choose, daf16choose, N2choose, 465)
-
-  heritabilities <- data.frame(trial = 1:mintochoose, bparam = 0, cparam = 0)
-
-  for (j in 1:mintochoose) {
-    print(paste("Processing iteration ", j, " out of ", mintochoose, ".", sep = ""))
-    daf2index <- sample(daf2sample, i, replace = FALSE)
-    daf16index <- sample(daf16sample, i, replace = FALSE)
-    N2index <- sample(N2sample, i, replace = FALSE)
-  
-    trial1daf2.df <- daf2notNA.df %>% filter(index %in% daf2index)
-    trial1daf16.df <- daf16notNA.df %>% filter(index %in% daf16index)
-    trial1N2.df <- N2notNA.df %>% filter(index %in% N2index)
-    trial1.df <- bind_rows(trial1daf2.df, trial1daf16.df, trial1N2.df)
-
-    well_twos_params.df <- data.frame(strain = rep(unique(strains), each = i), 
-                                    replicate = rep(1:i, length(unique(strains))), 
-                                    bparam = rep(0, length(unique(strains)) * i), 
-                                    cparam = rep(0, length(unique(strains)) * i))
-
-    l = 1
-
-    for (k in daf2index) {
-      temp <- nlm(well_twoplog_sample, c(2, 10), trial1.df, k, "daf-2")[["estimate"]]
-      well_twos_params.df$bparam[l] <- temp[1]
-      well_twos_params.df$cparam[l] <- temp[2]
-      l = l + 1
-    }
-
-    for (k in daf16index) {
-      temp <- nlm(well_twoplog_sample, c(2, 10), trial1.df, k, "daf-16")[["estimate"]]
-      well_twos_params.df$bparam[l] <- temp[1]
-      well_twos_params.df$cparam[l] <- temp[2]
-      l = l + 1
-    }
-
-    for (k in N2index) {
-      temp <- nlm(well_twoplog_sample, c(2, 10), trial1.df, k, "N2")[["estimate"]]
-      well_twos_params.df$bparam[l] <- temp[1]
-      well_twos_params.df$cparam[l] <- temp[2]
-      l = l + 1
-    }
-
-    x <- well_twos_params.df %>% select(c(strain, bparam))
-    x$pheno <- x$bparam
-    x <- x %>% select(c(strain, pheno))
-    heritabilities$bparam[j] <- H2.fun(x)
-
-    x <- well_twos_params.df %>% select(c(strain, cparam))
-    x$pheno <- x$cparam
-    x <- x %>% select(c(strain, pheno))
-    heritabilities$cparam[j] <- H2.fun(x)
-  }
-
-  master.herit$b.mean[i - 1] <- mean(heritabilities$bparam)
-  master.herit$b.sd[i - 1] <- sd(heritabilities$bparam)
-  master.herit$c.mean[i - 1] <- mean(heritabilities$cparam)
-  master.herit$c.sd[i - 1] <- sd(heritabilities$cparam)
-}
-
-ggplot(master.herit) + geom_line(aes(x = samples, y = b.mean, color = "red")) + geom_line(aes(x = samples, y = c.mean, color = "blue")) + geom_errorbar(aes(x = samples, ymax = b.mean + b.sd, ymin = b.mean - b.sd, color = "red")) + geom_errorbar(aes(x = samples, ymax = c.mean + c.sd, ymin = c.mean - c.sd, color = "blue")) + labs( x = "# Replicates", y = "Heritability") + guides(color = FALSE)
+ggplot(herit.summarized) + geom_line(aes(x = number, y = herit.mean, color = parameter), size = 2) + geom_errorbar(aes(x = number, ymin = herit.mean - herit.sd, ymax = herit.mean + herit.sd, color = parameter), size = 1, alpha = 0.8) + ylim(0, 1) + presentation + big.legend + labs(x = "Number of Replicates", y = "Heritability")
 
 ```

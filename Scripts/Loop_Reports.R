@@ -21,25 +21,26 @@ for (i in 1:length(experiments.file)) {
   knit2html("./Scripts/Longevity_Report_daf.Rmd", 
             output = paste("./Results/", experimentName, "_Report.html", sep = ""),
             stylesheet = "./Scripts/foghorn_edited.css")
-  #knit2html("./Scripts/Longevity_Report_Adjusted.Rmd", 
-   #         output = paste("./Results/", experimentName, "_Adjusted_Report.html", sep = ""),
-    #        stylesheet = "./Scripts/foghorn_edited.css")
 }
 
 experiments.file <- dir(path = "./Scripts", "p04", full.names = TRUE)
 for (i in 1:length(experiments.file)) {
   experimentName <- str_split(str_split(experiments.file[i], "Scripts/")[[1]][2], ".R")[[1]][1]
+  temporary <- experimentName
   knit2html("./Scripts/Longevity_Report_gompertz.Rmd", 
-            output = paste("./Results/", experimentName, "_Gompertz_Report.html", sep = ""),
+            output = paste("./Results/", experimentName, "_Report.html", sep = ""),
             stylesheet = "./Scripts/foghorn_edited.css")
+  experimentName <- temporary
   knit2html("./Scripts/Longevity_Report_weibull.Rmd", 
-            output = paste("./Results/", experimentName, "_Weibull_Report.html", sep = ""),
+            output = paste("./Results/", experimentName, "_Report.html", sep = ""),
             stylesheet = "./Scripts/foghorn_edited.css")
-  knit2html("./Scripts/Longevity_Report.Rmd", 
-            output = paste("./Results/", experimentName, "_TwoPLog_Report.html", sep = ""),
+  experimentName <- temporary
+  knit2html("./Scripts/Longevity_Report_twoplog.Rmd", 
+            output = paste("./Results/", experimentName, "_Report.html", sep = ""),
             stylesheet = "./Scripts/foghorn_edited.css")
+  experimentName <- temporary
   knit2html("./Scripts/Longevity_Report_threeplog.Rmd", 
-            output = paste("./Results/", experimentName, "_ThreePLog_Report.html", sep = ""),
+            output = paste("./Results/", experimentName, "_Report.html", sep = ""),
             stylesheet = "./Scripts/foghorn_edited.css")
 }
 

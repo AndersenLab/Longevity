@@ -36,6 +36,8 @@ files <- dir(path = paste("./Data/Raw/", experimentName, sep = ""),
 
 nFiles <- length(files)
 
+experimentName <- paste(experimentName, "_Gompertz", sep = "")
+
 fileAttributes.df <- data.frame(binSize = vector(length = nFiles),
                                 time = vector(length = nFiles),
                                 numGroups = vector(length = nFiles),
@@ -153,16 +155,17 @@ well.df <- well.df %>%
   mutate(norm.activity = 100 * activity / max(activity, na.rm = TRUE))
 well.df <- ungroup(well.df)
 
-well_params.df <- data.frame(strain = rep(strains, each = length(rows)), col = rep(1:12, each = length(rows)), row = rep(rows, nStrains), Aparam = rep(0, nStrains * replicates), Gparam = rep(0, nStrains * replicates))
+well_params.df <- data.frame(strain = rep(strains, each = length(rows)), col = rep(1:12, each = length(rows)), row = rep(rows, nStrains), Aparam = 0, Gparam = 0, minimum = 0)
 
 l = 1
 
 for (x in 1:12) {
   for (y in rows) {
     if (!(is.na(well.df$norm.activity[well.df$row == y & well.df$col == x]))[1] == TRUE) {
-      temp <- nlm(well_gompertz, c(0.004, 0.14), well.df, y, x)[["estimate"]]
-      well_params.df$Aparam[l] <- temp[1]
-      well_params.df$Gparam[l] <- temp[2]
+      temp <- nlm(well_gompertz, c(0.01, 0.06), well.df, y, x)
+      well_params.df$Aparam[l] <- temp[["estimate"]][1]
+      well_params.df$Gparam[l] <- temp[["estimate"]][2]
+      well_params.df$minimum[l] <- temp[["minimum"]][1]
     }
     l = l + 1
   }
@@ -188,7 +191,7 @@ for (i in 1:nrow(well.df)) {
   }
 }
 
-ggplot(well.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red"), size = 2, alpha = 0.8) + facet_grid(row ~ col, labeller = label_strains) + ylim(0, 100) + presentation + remove.legend + rotate.y.axis + labs(x = "Day", y = "Normalized Activity")
+ggplot(well.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red"), size = 2, alpha = 0.8) + facet_grid(row ~ col, labeller = label_strains) + ylim(0, 100) + presentation + remove.legend + labs(x = "Day", y = "Normalized Activity") + scale_x_continuous(breaks = seq(0, 30, 10))
 
 ```
 
@@ -215,16 +218,17 @@ for (i in 1:nrow(well_twos.df)) {
   if (!is.finite(well_twos.df$norm.activity[i])) well_twos.df$norm.activity[i] <- NA
 }
 
-well_twos_params.df <- data.frame(strain = rep(strains, each = 4), col = rep(1:12, each = 4), grouping = rep(1:4, nStrains), Aparam = rep(0, nStrains * 4), Gparam = rep(0, nStrains * 4))
+well_twos_params.df <- data.frame(strain = rep(strains, each = 4), col = rep(1:12, each = 4), grouping = rep(1:4, nStrains), Aparam = 0, Gparam = 0, minimum = 0)
 
 l = 1
 
 for (x in 1:12) {
   for (y in 1:4) {
     if (!(is.na(well_twos.df$norm.activity[well_twos.df$grouping == y & well_twos.df$col == x]))[1] == TRUE) {
-      temp <- nlm(well_gompertz_grouping, c(0.004, 0.14), well_twos.df, y, x)[["estimate"]]
-      well_twos_params.df$Aparam[l] <- temp[1]
-      well_twos_params.df$Gparam[l] <- temp[2]
+      temp <- nlm(well_gompertz_grouping, c(0.01, 0.06), well_twos.df, y, x)
+      well_twos_params.df$Aparam[l] <- temp[["estimate"]][1]
+      well_twos_params.df$Gparam[l] <- temp[["estimate"]][2]
+      well_twos_params.df$minimum[l] <- temp[["minimum"]][1]
     }
     l = l + 1
   }
@@ -250,7 +254,7 @@ for (i in 1:nrow(well_twos.df)) {
   }
 }
 
-ggplot(well_twos.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red"), size = 2, alpha = 0.8) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + remove.legend + rotate.y.axis + labs(x = "Day", y = "Normalized Activity")
+ggplot(well_twos.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red"), size = 2, alpha = 0.8) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + remove.legend + labs(x = "Day", y = "Normalized Activity") + scale_x_continuous(breaks = seq(0, 30, 10))
 
 ```
 
@@ -275,16 +279,17 @@ for (i in 1:nrow(well_threes.df)) {
   if (!is.finite(well_threes.df$norm.activity[i])) well_threes.df$norm.activity[i] <- NA
 }
 
-well_threes_params.df <- data.frame(strain = rep(strains, each = 3), col = rep(1:12, each = 3), grouping = rep(1:3, nStrains), Aparam = rep(0, nStrains * 3), Gparam = rep(0, nStrains * 3))
+well_threes_params.df <- data.frame(strain = rep(strains, each = 3), col = rep(1:12, each = 3), grouping = rep(1:3, nStrains), Aparam = 0, Gparam = 0, minimum = 0)
 
 l = 1
 
 for (x in 1:12) {
   for (y in 1:3) {
     if (!(is.na(well_threes.df$norm.activity[well_threes.df$grouping == y & well_threes.df$col == x]))[1] == TRUE) {
-      temp <- nlm(well_gompertz_grouping, c(0.004, 0.14), well_threes.df, y, x)[["estimate"]]
-      well_threes_params.df$Aparam[l] <- temp[1]
-      well_threes_params.df$Gparam[l] <- temp[2]
+      temp <- nlm(well_gompertz_grouping, c(0.01, 0.06), well_threes.df, y, x)
+      well_threes_params.df$Aparam[l] <- temp[["estimate"]][1]
+      well_threes_params.df$Gparam[l] <- temp[["estimate"]][2]
+      well_threes_params.df$minimum[l] <- temp[["minimum"]][1]
     }
     l = l + 1
   }
@@ -310,7 +315,7 @@ for (i in 1:nrow(well_threes.df)) {
   }
 }
 
-ggplot(well_threes.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red"), size = 2, alpha = 0.8) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + remove.legend + rotate.y.axis + labs(x = "Day", y = "Normalized Activity")
+ggplot(well_threes.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red"), size = 2, alpha = 0.8) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + remove.legend + labs(x = "Day", y = "Normalized Activity") + scale_x_continuous(breaks = seq(0, 30, 10))
 
 ```
 
@@ -335,16 +340,17 @@ for (i in 1:nrow(well_fours.df)) {
   if (!is.finite(well_fours.df$norm.activity[i])) well_fours.df$norm.activity[i] <- NA
 }
 
-well_fours_params.df <- data.frame(strain = rep(strains, each = 2), col = rep(1:12, each = 2), grouping = rep(1:2, nStrains), Aparam = rep(0, nStrains * 2), Gparam = rep(0, nStrains * 2))
+well_fours_params.df <- data.frame(strain = rep(strains, each = 2), col = rep(1:12, each = 2), grouping = rep(1:2, nStrains), Aparam = 0, Gparam = 0, minimum = 0)
 
 l = 1
 
 for (x in 1:12) {
   for (y in 1:2) {
     if (!(is.na(well_fours.df$norm.activity[well_fours.df$grouping == y & well_fours.df$col == x]))[1] == TRUE) {
-      temp <- nlm(well_gompertz_grouping, c(0.004, 0.14), well_fours.df, y, x)[["estimate"]]
-      well_fours_params.df$Aparam[l] <- temp[1]
-      well_fours_params.df$Gparam[l] <- temp[2]
+      temp <- nlm(well_gompertz_grouping, c(0.01, 0.06), well_fours.df, y, x)
+      well_fours_params.df$Aparam[l] <- temp[["estimate"]][1]
+      well_fours_params.df$Gparam[l] <- temp[["estimate"]][2]
+      well_fours_params.df$minimum[l] <- temp[["minimum"]][1]
     }
     l = l + 1
   }
@@ -370,7 +376,7 @@ for (i in 1:nrow(well_fours.df)) {
   }
 }
 
-ggplot(well_fours.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red"), size = 2, alpha = 0.8) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + remove.legend + rotate.y.axis + labs(x = "Day", y = "Normalized Activity")
+ggplot(well_fours.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red"), size = 2, alpha = 0.8) + facet_grid(grouping ~ col, labeller = label_strains) + ylim(0, 100) + presentation + remove.legend + labs(x = "Day", y = "Normalized Activity") + scale_x_continuous(breaks = seq(0, 30, 10))
 
 ```
 
@@ -393,15 +399,16 @@ for (i in 1:nrow(strain.df)) {
   if (!is.finite(strain.df$norm.activity[i])) strain.df$norm.activity[i] <- NA
 }
 
-strain_params.df <- data.frame(strain = unique(strains), Aparam = rep(0, length(unique(strains))), Gparam = rep(0, length(unique(strains))))
+strain_params.df <- data.frame(strain = unique(strains), Aparam = 0, Gparam = 0, minimum = 0)
 
 l = 1
 
 for (x in unique(strains)) {
   if (!(is.na(strain.df$norm.activity[strain.df$strain == x]))[1] == TRUE) {
-    temp <- nlm(strain_gompertz, c(0.004, 0.14), strain.df, x)[["estimate"]]
-    strain_params.df$Aparam[l] <- temp[1]
-    strain_params.df$Gparam[l] <- temp[2]
+    temp <- nlm(strain_gompertz, c(0.01, 0.06), strain.df, x)
+    strain_params.df$Aparam[l] <- temp[["estimate"]][1]
+    strain_params.df$Gparam[l] <- temp[["estimate"]][2]
+    strain_params.df$minimum[l] <- temp[["minimum"]][1]
   }
   l = l + 1
 }
@@ -424,7 +431,7 @@ for (i in 1:nrow(strain.df)) {
   }
 }
 
-ggplot(strain.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red"), size = 2, alpha = 0.8) + facet_wrap( ~ strain) + ylim(0, 100) + presentation + remove.legend + rotate.y.axis + labs(x = "Day", y = "Normalized Activity")
+ggplot(strain.df) + geom_point(aes(x = day, y = norm.activity)) + geom_line(aes(x = day, y = yvalue, color = "red"), size = 2, alpha = 0.8) + facet_wrap( ~ strain) + ylim(0, 100) + presentation + remove.legend + labs(x = "Day", y = "Normalized Activity") + scale_x_continuous(breaks = seq(0, 30, 10))
 
 ```
 
@@ -438,13 +445,14 @@ params.df$grouping <- c(rep("well", nrow(well_params.df)), rep("twos", nrow(well
 params.df$grouping <- ordered(params.df$grouping, levels = c("well", "twos", "threes", "fours", "strain"))
 
 for (i in 1:nrow(params.df)) {
-  if (params.df$Aparam[i] == 0 & params.df$Gparam[i] == 0) {
+  if (params.df$Aparam[i] == 0 & params.df$Gparam[i] == 0 & params.df$minimum[i] == 0) {
     params.df$Aparam[i] <- NA
     params.df$Gparam[i] <- NA
+    params.df$minimum[i] <- NA
   }
 }
 
-ggplot(params.df) + aes(x = Aparam, y = Gparam, size = grouping, color = grouping) + geom_point(alpha = 0.6) + facet_wrap( ~ strain) + presentation + big.legend + rotate.y.axis + labs(x = "A Parameter", y = "G Parameter")
+ggplot(params.df) + aes(x = Aparam, y = Gparam, size = grouping, color = grouping) + geom_point(alpha = 0.6) + facet_wrap( ~ strain) + presentation + big.legend + labs(x = "A Parameter", y = "G Parameter")
 
 #params.df %>% filter(grouping == "fours") %>% ggplot(.) + aes(x = strain, y = Aparam) + geom_boxplot() + geom_jitter() + presentation + ylim(0, NA)
 
@@ -478,6 +486,18 @@ save(heritabilities, file = paste(processedDataPath, "/", experimentName, "_heri
 
 plotting.df <- heritabilities %>% filter(as.numeric(grouping) < 5)
 
-ggplot(plotting.df) + aes(x = as.numeric(grouping), y = herit, color = parameter, size = 2) + geom_line() + labs(x = "Number of Wells Grouped", y = "Heritability") + ylim(0, 1) + presentation + remove.legend + rotate.y.axis
+ggplot(plotting.df) + aes(x = as.numeric(grouping), y = herit, color = parameter, size = 2) + geom_line() + labs(x = "Number of Wells Grouped", y = "Heritability") + ylim(0, 1) + presentation + remove.legend
+
+```
+
+## Quantifying Curve Fits ##
+
+```{r Minimum, warning = FALSE, message = FALSE, echo = FALSE, fig.path = paste(processedDataPath, "/", experimentName, "_", sep = ""), fig.width = 15, fig.height = 12}
+
+minimum.df <- params.df %>% group_by(grouping) %>% summarize(minimum.avg = mean(minimum, na.rm = TRUE),
+                                                             minimum.sd = sd(minimum, na.rm = TRUE))
+minimum.df$grouping <- c(1, 2, 3, 4, 8)
+
+ggplot(minimum.df) + aes(x = grouping, y = minimum.avg, size = 2) + geom_line() + labs(x = "Number of Wells Grouped", y = "Average Least Squares Deviation") + presentation + remove.legend + ylim(0, 5000)
 
 ```
