@@ -488,6 +488,8 @@ plotting.df <- heritabilities %>% filter(as.numeric(grouping) < 5)
 
 ggplot(plotting.df) + aes(x = as.numeric(grouping), y = herit, color = parameter, size = 2) + geom_line() + labs(x = "Number of Wells Grouped", y = "Heritability") + ylim(0, 1) + presentation + remove.legend
 
+ggplot(well_params.df) + aes(x = strain, y = bparam) + geom_boxplot() + geom_jitter() + presentation
+
 ```
 
 ## Quantifying Curve Fits ##

@@ -210,10 +210,10 @@ fours.herit.b <- 0.92
 fives.herit.a <- 0.95
 fives.herit.b <- 0.97
 
-heritability <- data.frame(herit = c(ones.herit.a, ones.herit.b, twos.herit.a, twos.herit.b, threes.herit.a, threes.herit.b, fours.herit.a, fours.herit.b,
-                                      fives.herit.a, fives.herit.b),
-                           parameter = rep(c("a", "b"), 5),
-                           number = rep(1:5, each = 2))
+heritability <- data.frame(herit = c(ones.herit.b, ones.herit.c, twos.herit.b, twos.herit.c, threes.herit.b, threes.herit.c, fours.herit.b, fours.herit.c,
+                                      fives.herit.b, fives.herit.c),
+                           parameter = rep(rep(c("a", "b"), each = 5), 5),
+                           number = rep(1:5, each = 10))
 
 herit.summarized <- heritability %>%
   group_by(parameter, number) %>%
